@@ -1,0 +1,1880 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FERRUM — Maintenance CMS</title>
+<meta name="description" content="FERRUM — Computerized Maintenance Management System" />
+
+<!-- Google Fonts: Inter -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+<style>
+/* ==========================================================================
+   FERRUM — Design Tokens
+   ========================================================================== */
+:root{
+  --primary:#0000FF;
+  --primary-dark:#0000CC;
+  --secondary:#4F7DFF;
+  --bg:#F5F7FB;
+  --card:#FFFFFF;
+  --border:#E5E7EB;
+  --success:#16A34A;
+  --success-bg:#EAF9EF;
+  --warning:#F59E0B;
+  --warning-bg:#FEF6E7;
+  --danger:#DC2626;
+  --danger-bg:#FDEBEA;
+  --text:#1F2937;
+  --text-muted:#6B7280;
+  --text-dim:#9CA3AF;
+  --purple:#9333EA;
+  --purple-bg:#F6EEFC;
+  --teal:#0D9488;
+  --teal-bg:#E7F7F5;
+
+  --radius:16px;
+  --radius-sm:10px;
+  --radius-xs:6px;
+  --shadow-sm:0 1px 2px rgba(15,23,42,.04);
+  --shadow-md:0 2px 8px rgba(15,23,42,.06);
+  --shadow-lg:0 8px 24px rgba(15,23,42,.10);
+  --font:'Inter',system-ui,-apple-system,sans-serif;
+  --sidebar-w:250px;
+  --sidebar-w-collapsed:76px;
+  --header-h:68px;
+  --transition:.3s cubic-bezier(.4,0,.2,1);
+}
+
+[data-theme="dark"]{
+  --bg:#10121A;
+  --card:#181B25;
+  --border:#2A2E3B;
+  --text:#E8EAF0;
+  --text-muted:#9AA1B4;
+  --text-dim:#6B7284;
+  --success-bg:#0F2A1C;
+  --warning-bg:#332409;
+  --danger-bg:#341313;
+  --purple-bg:#241735;
+  --teal-bg:#0C2624;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.25);
+  --shadow-md:0 2px 10px rgba(0,0,0,.3);
+  --shadow-lg:0 8px 28px rgba(0,0,0,.4);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+*::-webkit-scrollbar{width:8px;height:8px;}
+*::-webkit-scrollbar-track{background:transparent;}
+*::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px;}
+html,body{height:100%;}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  font-size:14px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  transition:background var(--transition),color var(--transition);
+}
+button,input,select,textarea{font-family:var(--font);color:inherit;}
+button{cursor:pointer;}
+h1,h2,h3,h4{font-weight:700;}
+a{color:inherit;}
+.hidden{display:none !important;}
+
+/* ---- Animations ---- */
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+@keyframes ripple{to{transform:scale(3);opacity:0}}
+.fade-in{animation:fadeIn .3s ease both;}
+.fade-up{animation:fadeUp .35s ease both;}
+
+/* ==========================================================================
+   Loading Screen
+   ========================================================================== */
+#loadingScreen{
+  position:fixed;inset:0;z-index:9999;background:var(--primary);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;color:#fff;
+  transition:opacity .4s ease, visibility .4s ease;
+}
+#loadingScreen.hide{opacity:0;visibility:hidden;pointer-events:none;}
+.loading-logo{font-size:34px;font-weight:800;letter-spacing:2px;display:flex;align-items:center;gap:12px;}
+.loading-logo i{font-size:30px;animation:spin 1.6s linear infinite;}
+.loading-sub{font-size:13px;opacity:.8;letter-spacing:.5px;}
+.loading-bar{width:220px;height:4px;background:rgba(255,255,255,.25);border-radius:4px;overflow:hidden;}
+.loading-bar span{display:block;height:100%;width:40%;background:#fff;border-radius:4px;animation:loadbar 1.1s ease-in-out infinite;}
+@keyframes loadbar{0%{transform:translateX(-100%)}100%{transform:translateX(340%)}}
+
+/* ==========================================================================
+   Login Screen
+   ========================================================================== */
+#loginScreen{
+  position:fixed;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);
+  padding:20px;
+}
+.login-card{
+  width:100%;max-width:400px;background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:40px 34px;animation:fadeUp .5s ease both;
+}
+.login-brand{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:28px;}
+.login-brand-badge{
+  width:56px;height:56px;border-radius:16px;background:var(--primary);
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;
+}
+.login-brand h1{font-size:24px;letter-spacing:3px;color:var(--text);}
+.login-brand p{font-size:12px;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;}
+.login-form label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin:14px 0 6px;}
+.input-group{position:relative;}
+.input-group i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:14px;}
+.input-group input{
+  width:100%;padding:12px 14px 12px 40px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--bg);font-size:14px;transition:border-color var(--transition),box-shadow var(--transition);
+}
+.input-group input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(0,0,255,.12);}
+.input-group .toggle-pass{left:auto;right:14px;cursor:pointer;pointer-events:all;}
+.login-error{
+  margin-top:14px;padding:10px 12px;background:var(--danger-bg);color:var(--danger);border-radius:var(--radius-xs);
+  font-size:12.5px;display:none;align-items:center;gap:8px;
+}
+.login-error.show{display:flex;animation:fadeUp .3s ease;}
+.btn-login{
+  width:100%;margin-top:22px;padding:13px;border:none;border-radius:var(--radius-sm);
+  background:var(--primary);color:#fff;font-weight:600;font-size:14.5px;
+  display:flex;align-items:center;justify-content:center;gap:8px;transition:background var(--transition);
+  position:relative;overflow:hidden;
+}
+.btn-login:hover{background:var(--primary-dark);}
+.btn-login:disabled{opacity:.7;cursor:not-allowed;}
+.login-foot{margin-top:20px;text-align:center;font-size:11.5px;color:var(--text-dim);}
+
+/* ==========================================================================
+   Ripple
+   ========================================================================== */
+.ripple-el{position:absolute;border-radius:50%;background:rgba(255,255,255,.55);transform:scale(0);animation:ripple .55s linear;pointer-events:none;}
+
+/* ==========================================================================
+   App Shell
+   ========================================================================== */
+#appShell{display:flex;height:100vh;overflow:hidden;}
+.overlay-drawer{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:60;display:none;}
+.overlay-drawer.show{display:block;}
+@media(min-width:1025px){.overlay-drawer{display:none !important;}}
+
+/* ---- Sidebar ---- */
+.sidebar{
+  width:var(--sidebar-w);background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;
+  flex-shrink:0;transition:width var(--transition),transform var(--transition);z-index:70;position:relative;
+}
+.sidebar.collapsed{width:var(--sidebar-w-collapsed);}
+@media(max-width:1024px){
+  .sidebar{position:fixed;top:0;left:0;height:100%;transform:translateX(-100%);width:var(--sidebar-w) !important;}
+  .sidebar.open{transform:translateX(0);box-shadow:var(--shadow-lg);}
+}
+.sidebar-head{height:var(--header-h);display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sidebar.collapsed .sidebar-head{padding:0;justify-content:center;}
+.sidebar-logo-badge{width:36px;height:36px;border-radius:12px;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0;}
+.sidebar-logo-text{min-width:0;}
+.sidebar.collapsed .sidebar-logo-text{display:none;}
+.sidebar-logo-text b{font-size:16px;letter-spacing:2px;display:block;}
+.sidebar-logo-text span{font-size:10px;color:var(--text-dim);letter-spacing:.5px;text-transform:uppercase;}
+
+.sidebar-nav{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:3px;}
+.nav-section-label{font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;padding:10px 12px 6px;}
+.sidebar.collapsed .nav-section-label{display:none;}
+.nav-item{
+  display:flex;align-items:center;gap:12px;padding:11px 14px;border:none;background:none;border-radius:var(--radius-sm);
+  color:var(--text-muted);font-size:13.5px;font-weight:500;width:100%;text-align:left;transition:all .18s;position:relative;
+}
+.nav-item i{width:18px;text-align:center;font-size:15px;flex-shrink:0;}
+.nav-item:hover{background:var(--bg);color:var(--text);}
+.nav-item.active{background:rgba(0,0,255,.08);color:var(--primary);font-weight:600;}
+[data-theme="dark"] .nav-item.active{background:rgba(79,125,255,.14);}
+.sidebar.collapsed .nav-item{justify-content:center;padding:11px 0;}
+.sidebar.collapsed .nav-label,.sidebar.collapsed .nav-badge{display:none;}
+.nav-label{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.nav-badge{font-size:10.5px;font-weight:700;background:var(--danger);color:#fff;border-radius:99px;padding:1px 7px;}
+
+.sidebar-foot{border-top:1px solid var(--border);padding:12px;flex-shrink:0;}
+.sidebar-user{display:flex;align-items:center;gap:10px;padding:8px;border-radius:var(--radius-sm);}
+.sidebar.collapsed .sidebar-user{justify-content:center;}
+.sidebar-avatar{width:34px;height:34px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;}
+.sidebar-user-info{min-width:0;}
+.sidebar.collapsed .sidebar-user-info{display:none;}
+.sidebar-user-info b{font-size:12.5px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sidebar-user-info span{font-size:10.5px;color:var(--text-dim);text-transform:capitalize;}
+.btn-collapse{
+  display:none;position:absolute;top:20px;right:-12px;width:24px;height:24px;border-radius:50%;background:var(--card);
+  border:1px solid var(--border);align-items:center;justify-content:center;box-shadow:var(--shadow-sm);color:var(--text-muted);
+  font-size:11px;z-index:5;
+}
+@media(min-width:1025px){.btn-collapse{display:flex;}}
+.sidebar.collapsed .btn-collapse i{transform:rotate(180deg);}
+
+/* ---- Main / Topbar ---- */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
+.topbar{
+  height:var(--header-h);border-bottom:1px solid var(--border);background:var(--card);display:flex;align-items:center;
+  gap:16px;padding:0 24px;flex-shrink:0;position:sticky;top:0;z-index:40;
+}
+.topbar-hamburger{display:flex;background:none;border:none;color:var(--text-muted);font-size:18px;}
+@media(min-width:1025px){.topbar-hamburger{display:none;}}
+.topbar-title{min-width:0;}
+.topbar-title h2{font-size:17px;}
+.topbar-title span{font-size:11.5px;color:var(--text-dim);}
+.topbar-search{
+  flex:1;max-width:340px;display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--border);
+  border-radius:99px;padding:9px 16px;color:var(--text-dim);
+}
+.topbar-search input{flex:1;border:none;background:none;outline:none;font-size:13px;color:var(--text);}
+@media(max-width:768px){.topbar-search{display:none;}}
+.topbar-spacer{flex:1;}
+.topbar-actions{display:flex;align-items:center;gap:6px;}
+.icon-btn{
+  width:38px;height:38px;border-radius:50%;border:none;background:none;color:var(--text-muted);font-size:15px;
+  display:flex;align-items:center;justify-content:center;position:relative;transition:background var(--transition),color var(--transition);
+}
+.icon-btn:hover{background:var(--bg);color:var(--primary);}
+.icon-dot{position:absolute;top:7px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--danger);border:2px solid var(--card);}
+.topbar-clock{text-align:right;padding-right:6px;display:none;}
+@media(min-width:900px){.topbar-clock{display:block;}}
+.topbar-clock b{font-size:14px;display:block;letter-spacing:.5px;}
+.topbar-clock span{font-size:10.5px;color:var(--text-dim);}
+.topbar-divider{width:1px;height:26px;background:var(--border);margin:0 4px;}
+@media(max-width:899px){.topbar-divider{display:none;}}
+
+/* ---- Notification / dropdown panel ---- */
+.dropdown-panel{
+  position:absolute;top:56px;right:24px;width:320px;max-height:420px;overflow-y:auto;background:var(--card);
+  border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);z-index:80;display:none;
+  animation:slideDown .2s ease both;
+}
+.dropdown-panel.show{display:block;}
+.dropdown-head{padding:14px 16px;border-bottom:1px solid var(--border);font-weight:700;font-size:13px;display:flex;justify-content:space-between;align-items:center;}
+.dropdown-head span{font-size:11px;color:var(--text-dim);font-weight:500;}
+.notif-item{display:flex;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);}
+.notif-item:last-child{border-bottom:none;}
+.notif-icon{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;}
+.notif-text b{font-size:12.5px;display:block;}
+.notif-text span{font-size:11.5px;color:var(--text-dim);}
+
+/* ==========================================================================
+   Page container
+   ========================================================================== */
+.page-container{flex:1;overflow-y:auto;padding:24px;}
+.page{display:none;}
+.page.active{display:block;animation:fadeUp .35s ease both;}
+.page-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
+.page-head h1{font-size:21px;}
+.page-head p{font-size:12.5px;color:var(--text-muted);margin-top:2px;}
+.page-head-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+/* ---- Buttons ---- */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:var(--radius-sm);border:none;
+  font-size:12.5px;font-weight:600;transition:transform .15s,box-shadow var(--transition),background var(--transition);
+  position:relative;overflow:hidden;white-space:nowrap;
+}
+.btn i{font-size:12px;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover{background:var(--primary-dark);}
+.btn-outline{background:var(--card);color:var(--text);border:1.5px solid var(--border);}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary);}
+.btn-ghost{background:var(--bg);color:var(--text-muted);}
+.btn-ghost:hover{background:var(--border);color:var(--text);}
+.btn-sm{padding:7px 12px;font-size:11.5px;}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none !important;}
+
+/* ---- Cards / KPI ---- */
+.grid-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-bottom:22px;}
+.kpi-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;
+  display:flex;flex-direction:column;gap:10px;transition:border-color var(--transition);cursor:default;
+}
+.kpi-card:hover{border-color:var(--primary);}
+.kpi-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.kpi-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.kpi-trend{font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;}
+.kpi-value{font-size:24px;font-weight:800;line-height:1.1;}
+.kpi-label{font-size:12px;color:var(--text-muted);font-weight:600;}
+.kpi-sub{font-size:10.5px;color:var(--text-dim);}
+
+.bg-primary{background:rgba(0,0,255,.1);color:var(--primary);}
+.bg-secondary{background:rgba(79,125,255,.12);color:var(--secondary);}
+.bg-success{background:var(--success-bg);color:var(--success);}
+.bg-warning{background:var(--warning-bg);color:var(--warning);}
+.bg-danger{background:var(--danger-bg);color:var(--danger);}
+.bg-purple{background:var(--purple-bg);color:var(--purple);}
+.bg-teal{background:var(--teal-bg);color:var(--teal);}
+.text-success{color:var(--success);}
+.text-warning{color:var(--warning);}
+.text-danger{color:var(--danger);}
+
+/* ---- Panels / Charts grid ---- */
+.grid-charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px;margin-bottom:22px;}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;}
+.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.panel-head h3{font-size:13.5px;}
+.panel-head span{font-size:11px;color:var(--text-dim);}
+.chart-wrap{position:relative;height:260px;}
+.chart-wrap.sm{height:220px;}
+
+/* ---- Data table ---- */
+.dt-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px;}
+.dt-search{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:99px;padding:8px 14px;min-width:200px;flex:1;max-width:280px;}
+.dt-search i{color:var(--text-dim);font-size:12px;}
+.dt-search input{border:none;background:none;outline:none;font-size:12.5px;flex:1;color:var(--text);}
+.dt-filters{display:flex;gap:8px;flex-wrap:wrap;}
+.dt-filters select{padding:8px 12px;border-radius:var(--radius-xs);border:1px solid var(--border);background:var(--card);font-size:12px;color:var(--text);}
+.dt-toolbar-actions{margin-left:auto;display:flex;gap:8px;}
+.dt-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-sm);}
+table.dt-table{width:100%;border-collapse:collapse;min-width:640px;}
+table.dt-table thead th{
+  background:var(--bg);text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted);
+  padding:11px 14px;white-space:nowrap;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;
+}
+table.dt-table thead th:hover{color:var(--primary);}
+table.dt-table thead th i{font-size:9px;margin-left:5px;opacity:.6;}
+table.dt-table tbody td{padding:11px 14px;font-size:12.5px;border-bottom:1px solid var(--border);white-space:nowrap;}
+table.dt-table tbody tr:last-child td{border-bottom:none;}
+table.dt-table tbody tr.dt-row-clickable{cursor:pointer;transition:background .15s;}
+table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
+.dt-footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px;flex-wrap:wrap;gap:10px;}
+.dt-info{font-size:11.5px;color:var(--text-dim);}
+.dt-pagination{display:flex;gap:5px;}
+.dt-page-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:12px;color:var(--text-muted);}
+.dt-page-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.dt-page-btn:disabled{opacity:.4;}
+
+/* ---- Badges ---- */
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:99px;text-transform:capitalize;white-space:nowrap;}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;}
+.badge-gray{background:var(--bg);color:var(--text-muted);}
+.badge-blue{background:rgba(79,125,255,.12);color:var(--secondary);}
+.badge-purple{background:var(--purple-bg);color:var(--purple);}
+.badge-amber{background:var(--warning-bg);color:var(--warning);}
+.badge-green{background:var(--success-bg);color:var(--success);}
+.badge-red{background:var(--danger-bg);color:var(--danger);}
+
+/* ---- Empty / Error states ---- */
+.state-block{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;text-align:center;gap:10px;color:var(--text-dim);}
+.state-block i{font-size:40px;opacity:.4;}
+.state-block b{font-size:13px;color:var(--text-muted);}
+.state-block span{font-size:11.5px;max-width:280px;}
+.state-block .btn{margin-top:6px;}
+
+/* ---- Skeleton ---- */
+.skel{border-radius:8px;background:linear-gradient(90deg,var(--border) 25%,var(--bg) 37%,var(--border) 63%);background-size:400px 100%;animation:shimmer 1.4s infinite linear;}
+.skel-line{height:12px;margin:6px 0;}
+.skel-card{height:110px;border-radius:var(--radius);}
+
+/* ---- Form ---- */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+.form-field label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;}
+.form-field input,.form-field select,.form-field textarea{
+  width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--radius-xs);background:var(--bg);
+  font-size:13px;color:var(--text);transition:border-color var(--transition),box-shadow var(--transition);
+}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(0,0,255,.1);}
+.form-field textarea{resize:vertical;min-height:80px;}
+.form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;padding-top:18px;border-top:1px solid var(--border);}
+
+/* ---- Tabs ---- */
+.tabs{display:flex;gap:4px;background:var(--bg);padding:4px;border-radius:var(--radius-sm);width:fit-content;margin-bottom:20px;}
+.tab-btn{padding:9px 18px;border:none;background:none;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--text-muted);transition:all .2s;}
+.tab-btn.active{background:var(--card);color:var(--primary);}
+.tab-content{display:none;}
+.tab-content.active{display:block;animation:fadeIn .3s ease;}
+
+/* ---- Toast ---- */
+#toastContainer{position:fixed;bottom:22px;right:22px;z-index:9500;display:flex;flex-direction:column;gap:10px;max-width:340px;}
+.toast{
+  background:var(--card);border:1px solid var(--border);border-left:4px solid var(--primary);border-radius:var(--radius-xs);
+  box-shadow:var(--shadow-lg);padding:13px 15px;display:flex;gap:10px;align-items:flex-start;animation:slideInRight .3s ease both;
+}
+.toast.success{border-left-color:var(--success);}
+.toast.error{border-left-color:var(--danger);}
+.toast.warning{border-left-color:var(--warning);}
+.toast i.toast-icon{font-size:16px;margin-top:1px;}
+.toast.success i.toast-icon{color:var(--success);}
+.toast.error i.toast-icon{color:var(--danger);}
+.toast.warning i.toast-icon{color:var(--warning);}
+.toast.info i.toast-icon{color:var(--primary);}
+.toast-msg{font-size:12.5px;flex:1;}
+.toast-close{background:none;border:none;color:var(--text-dim);font-size:12px;}
+
+/* ---- Modal ---- */
+.modal-backdrop{position:fixed;inset:0;background:rgba(15,17,26,.55);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-backdrop.show{display:flex;animation:fadeIn .2s ease;}
+.modal-box{background:var(--card);border-radius:var(--radius);width:100%;max-width:520px;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:fadeUp .3s ease both;}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--border);}
+.modal-head h3{font-size:15px;}
+.modal-body{padding:20px 22px;}
+.modal-close{background:var(--bg);border:none;width:30px;height:30px;border-radius:50%;color:var(--text-muted);}
+.detail-row{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+.detail-row:last-child{border-bottom:none;}
+.detail-row b{color:var(--text-muted);font-weight:600;flex-shrink:0;}
+.detail-row span{text-align:right;}
+
+/* ---- Misc ---- */
+.stock-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;}
+::selection{background:rgba(0,0,255,.2);}
+
+/* ---- Responsive ---- */
+@media(max-width:640px){
+  .page-container{padding:16px;}
+  .topbar{padding:0 14px;gap:10px;}
+  .login-card{padding:30px 22px;}
+}
+
+/* ---- Print ---- */
+@media print{
+  .sidebar,.topbar,.dt-toolbar,.dt-pagination,.page-head-actions,#toastContainer,.btn{display:none !important;}
+  .page-container{overflow:visible;padding:0;}
+  body,[data-theme]{background:#fff !important;color:#000 !important;}
+  .page{display:none !important;}
+  .page.print-target{display:block !important;}
+  .panel,.kpi-card{break-inside:avoid;border:1px solid #ccc !important;box-shadow:none !important;}
+}
+</style>
+</head>
+<body>
+
+<!-- ==========================================================================
+     LOADING SCREEN
+     ========================================================================== -->
+<div id="loadingScreen">
+  <div class="loading-logo"><i class="fa-solid fa-industry"></i> FERRUM</div>
+  <div class="loading-sub">Memuat Maintenance CMS…</div>
+  <div class="loading-bar"><span></span></div>
+</div>
+
+<!-- ==========================================================================
+     LOGIN SCREEN
+     ========================================================================== -->
+<div id="loginScreen" class="hidden">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="login-brand-badge"><i class="fa-solid fa-industry"></i></div>
+      <h1>FERRUM</h1>
+      <p>Maintenance Management System</p>
+    </div>
+    <form class="login-form" id="loginForm" autocomplete="off">
+      <label for="loginUsername">Username</label>
+      <div class="input-group">
+        <i class="fa-solid fa-user"></i>
+        <input type="text" id="loginUsername" placeholder="Masukkan username" required />
+      </div>
+      <label for="loginPassword">Password</label>
+      <div class="input-group">
+        <i class="fa-solid fa-lock"></i>
+        <input type="password" id="loginPassword" placeholder="Masukkan password" required />
+        <i class="fa-solid fa-eye toggle-pass" id="togglePassBtn"></i>
+      </div>
+      <div class="login-error" id="loginError"><i class="fa-solid fa-triangle-exclamation"></i><span></span></div>
+      <button type="submit" class="btn-login" id="loginSubmitBtn">
+        <i class="fa-solid fa-right-to-bracket"></i> <span>Masuk</span>
+      </button>
+    </form>
+    <div class="login-foot">FERRUM CMS &copy; <span id="loginYear"></span> — Powered by Google Sheets</div>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     APP SHELL
+     ========================================================================== -->
+<div id="appShell" class="hidden">
+  <div class="overlay-drawer" id="overlayDrawer"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <button class="btn-collapse" id="btnCollapse"><i class="fa-solid fa-chevron-left"></i></button>
+    <div class="sidebar-head">
+      <div class="sidebar-logo-badge"><i class="fa-solid fa-industry"></i></div>
+      <div class="sidebar-logo-text"><b>FERRUM</b><span>Maintenance CMS</span></div>
+    </div>
+    <nav class="sidebar-nav" id="sidebarNav">
+      <span class="nav-section-label">Menu Utama</span>
+      <button class="nav-item active" data-page="overview"><i class="fa-solid fa-gauge-high"></i><span class="nav-label">Overview</span></button>
+      <button class="nav-item" data-page="activities"><i class="fa-solid fa-clipboard-list"></i><span class="nav-label">Activities</span></button>
+      <button class="nav-item" data-page="sparepart"><i class="fa-solid fa-boxes-stacked"></i><span class="nav-label">Sparepart</span></button>
+      <button class="nav-item" data-page="meter"><i class="fa-solid fa-gauge"></i><span class="nav-label">Machine Meter</span></button>
+      <button class="nav-item" data-page="po"><i class="fa-solid fa-file-invoice-dollar"></i><span class="nav-label">Purchase Orders</span></button>
+      <span class="nav-section-label">Akun</span>
+      <button class="nav-item" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i><span class="nav-label">Logout</span></button>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="sidebarAvatar">–</div>
+        <div class="sidebar-user-info"><b id="sidebarUserName">–</b><span id="sidebarUserRole">–</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="topbar-hamburger" id="btnHamburger"><i class="fa-solid fa-bars"></i></button>
+      <div class="topbar-title">
+        <h2 id="topbarTitle">Overview</h2>
+        <span id="topbarSubtitle">Ringkasan performa maintenance</span>
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="topbar-search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="globalSearch" placeholder="Cari data…" />
+      </div>
+      <div class="topbar-clock">
+        <b id="clockTime">--:--:--</b>
+        <span id="clockDate">-- --- ----</span>
+      </div>
+      <div class="topbar-divider"></div>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="btnRefresh" title="Refresh data"><i class="fa-solid fa-rotate"></i></button>
+        <button class="icon-btn" id="btnNotif" title="Notifikasi"><i class="fa-regular fa-bell"></i><span class="icon-dot hidden" id="notifDot"></span></button>
+        <button class="icon-btn" id="btnDark" title="Dark mode"><i class="fa-solid fa-moon"></i></button>
+        <button class="icon-btn" id="btnFullscreen" title="Fullscreen"><i class="fa-solid fa-expand"></i></button>
+        <button class="icon-btn" id="btnPrint" title="Print dashboard"><i class="fa-solid fa-print"></i></button>
+      </div>
+      <!-- notification dropdown -->
+      <div class="dropdown-panel" id="notifPanel">
+        <div class="dropdown-head">Notifikasi <span id="notifCount">0 baru</span></div>
+        <div id="notifList"></div>
+      </div>
+    </header>
+
+    <!-- PAGE CONTAINER -->
+    <div class="page-container" id="pageContainer">
+
+      <!-- ============================= OVERVIEW ============================= -->
+      <section class="page active" id="page-overview">
+        <div class="page-head">
+          <div><h1>Overview Dashboard</h1><p>Ringkasan downtime &amp; performa mesin — auto-refresh setiap 60 detik</p></div>
+          <div class="page-head-actions">
+            <button class="btn btn-outline btn-sm" id="btnExportOverview"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+            <button class="btn btn-primary btn-sm" id="btnRefreshOverview"><i class="fa-solid fa-rotate"></i> Refresh</button>
+          </div>
+        </div>
+
+        <div class="grid-kpi" id="kpiGrid"></div>
+
+        <div class="grid-charts">
+          <div class="panel"><div class="panel-head"><h3>Downtime per Mesin</h3><span>Total menit</span></div><div class="chart-wrap"><canvas id="chartMesin"></canvas></div></div>
+          <div class="panel"><div class="panel-head"><h3>Downtime per Kategori</h3><span>Total menit</span></div><div class="chart-wrap"><canvas id="chartArea"></canvas></div></div>
+          <div class="panel"><div class="panel-head"><h3>Downtime per Hari</h3><span>14 hari terakhir</span></div><div class="chart-wrap"><canvas id="chartHarian"></canvas></div></div>
+          <div class="panel"><div class="panel-head"><h3>Top Komponen Bermasalah</h3><span>5 teratas</span></div><div class="chart-wrap"><canvas id="chartComponent"></canvas></div></div>
+          <div class="panel"><div class="panel-head"><h3>Top Root Cause</h3><span>5 teratas</span></div><div class="chart-wrap"><canvas id="chartRootCause"></canvas></div></div>
+          <div class="panel"><div class="panel-head"><h3>Top Sparepart Terpakai</h3><span>5 teratas</span></div><div class="chart-wrap"><canvas id="chartTopSparepart"></canvas></div></div>
+          <div class="panel"><div class="panel-head"><h3>Status Issue</h3><span>Open vs Closed</span></div><div class="chart-wrap sm"><canvas id="chartStatusIssue"></canvas></div></div>
+          <div class="panel"><div class="panel-head"><h3>Monthly Trend</h3><span>Jumlah kejadian / bulan</span></div><div class="chart-wrap"><canvas id="chartMonthly"></canvas></div></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h3>Latest Downtime</h3><span>Data dari sheet ORS</span></div>
+          <div id="tbl-ors"></div>
+        </div>
+      </section>
+
+      <!-- ============================= ACTIVITIES ============================= -->
+      <section class="page" id="page-activities">
+        <div class="page-head">
+          <div><h1>Activities</h1><p>Input &amp; riwayat shift log teknisi</p></div>
+        </div>
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="input">Input</button>
+          <button class="tab-btn" data-tab="history">History</button>
+        </div>
+
+        <div class="tab-content active" id="tab-input">
+          <div class="panel">
+            <form id="activityForm" class="form-grid">
+              <div class="form-field"><label>Tanggal</label><input type="date" id="actTanggal" required /></div>
+              <div class="form-field"><label>Shift</label>
+                <select id="actShift" required><option value="">Pilih shift</option><option>Shift 1</option><option>Shift 2</option><option>Shift 3</option></select>
+              </div>
+              <div class="form-field"><label>Teknisi</label><input type="text" id="actTeknisi" placeholder="Nama teknisi" required /></div>
+              <div class="form-field"><label>Area</label><input type="text" id="actArea" placeholder="Area / line" required /></div>
+              <div class="form-field"><label>Mesin</label>
+                <select id="actMesin" required><option value="">Pilih mesin</option></select>
+              </div>
+              <div class="form-field"><label>Status</label>
+                <select id="actStatus" required><option value="">Pilih status</option><option>Open</option><option>In Progress</option><option>Closed</option></select>
+              </div>
+              <div class="form-field" style="grid-column:1/-1;"><label>Issue</label><textarea id="actIssue" placeholder="Deskripsikan issue" required></textarea></div>
+              <div class="form-field" style="grid-column:1/-1;"><label>Action</label><textarea id="actAction" placeholder="Tindakan yang dilakukan"></textarea></div>
+              <div class="form-field" style="grid-column:1/-1;"><label>Remark</label><textarea id="actRemark" placeholder="Catatan tambahan"></textarea></div>
+              <div class="form-actions" style="grid-column:1/-1;">
+                <button type="reset" class="btn btn-outline">Reset</button>
+                <button type="submit" class="btn btn-primary" id="btnSubmitActivity"><i class="fa-solid fa-paper-plane"></i> Simpan</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-history">
+          <div class="panel"><div id="tbl-activities"></div></div>
+        </div>
+      </section>
+
+      <!-- ============================= SPAREPART ============================= -->
+      <section class="page" id="page-sparepart">
+        <div class="page-head">
+          <div><h1>Sparepart</h1><p>Monitoring stok sparepart maintenance</p></div>
+          <div class="page-head-actions"><button class="btn btn-primary btn-sm" id="btnRefreshSparepart"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
+        </div>
+        <div class="grid-kpi" id="spKpiGrid" style="margin-bottom:18px;"></div>
+        <div class="panel"><div id="tbl-sparepart"></div></div>
+      </section>
+
+      <!-- ============================= METER ============================= -->
+      <section class="page" id="page-meter">
+        <div class="page-head">
+          <div><h1>Machine Meter</h1><p id="meterSubtitle">Running hour komponen per area (mingguan)</p></div>
+          <div class="page-head-actions"><button class="btn btn-primary btn-sm" id="btnRefreshMeter"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
+        </div>
+        <div class="grid-kpi" id="meterKpiGrid" style="margin-bottom:18px;"></div>
+        <div class="panel"><div id="tbl-meter"></div></div>
+      </section>
+
+      <!-- ============================= PURCHASE ORDER ============================= -->
+      <section class="page" id="page-po">
+        <div class="page-head">
+          <div><h1>Purchase Orders</h1><p>Status pengadaan sparepart &amp; material — status ditentukan otomatis dari kolom tanggal PR/PO/GR</p></div>
+          <div class="page-head-actions"><button class="btn btn-primary btn-sm" id="btnRefreshPO"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
+        </div>
+        <div class="grid-kpi" id="poKpiGrid" style="margin-bottom:18px;"></div>
+        <div class="panel"><div id="tbl-po"></div></div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal-box">
+    <div class="modal-head"><h3 id="modalTitle">Detail</h3><button class="modal-close" id="modalCloseBtn"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- Toasts -->
+<div id="toastContainer"></div>
+
+<script>
+/* ==========================================================================
+   FERRUM — Maintenance CMS
+   Single-file vanilla JS application. No backend, no build step.
+   Data source : Google Sheets (published) via GViz JSON endpoint.
+   Write path  : Google Apps Script Web App (Activities input).
+
+   Architecture notes (baca ini sebelum menambah modul baru):
+   - CONFIG.NAV_ITEMS mendaftarkan halaman & ikon sidebar. Modul baru cukup
+     menambah entry di sini + membuat <section class="page" id="page-xxx">
+     + fungsi render-nya sendiri, tanpa mengubah struktur inti router.
+   - createDataTable() adalah komponen tabel generik (search/sort/filter/
+     pagination/export) yang dipakai ulang oleh semua tabel di aplikasi.
+   - Setiap sheet punya loader terpisah (loadORS, loadActivities, dst) yang
+     hanya bertanggung jawab fetch + normalisasi data ke STATE.data.*.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------------- *
+ * 1. CONFIGURATION
+ * ---------------------------------------------------------------------- */
+const SPREADSHEET_ID = "11-sqiV3BYqx738Rhr3Y9SF4Q7FnAGKNqMn-Gvoq6rFs"; // <-- isi dengan ID Google Spreadsheet (published to web)
+const WEBAPP_URL = "";     // <-- isi dengan URL Google Apps Script Web App (untuk submitActivity)
+
+const CONFIG = {
+  // Nama tab sheet non-ORS, sesuai spreadsheet Anda.
+  SHEETS:{ ACTIVITIES:'Maintenance', SPAREPART:'Sparepart', METER:'Running Hour', PO:'PRPO', USER:'User' },
+  // Data downtime (ORS) tersebar di 1 tab per mesin — dimuat paralel lalu digabung jadi satu dataset.
+  // Tambah/hapus entry di sini jika jumlah mesin berubah, tanpa mengubah logic loadORS().
+  ORS_SHEETS:{ 'ORS_Tetra':'Tetra Pak', 'ORS_SIG1':'SIG Combibloc 1', 'ORS_SIG2':'SIG Combibloc 2', 'ORS_SIG3':'SIG Combibloc 3' },
+  MACHINES:['Tetra Pak','SIG Combibloc 1','SIG Combibloc 2','SIG Combibloc 3'],
+  AUTO_REFRESH_MS:60000,
+  DURATION_UNIT:'minutes', // 'minutes' | 'hours' — satuan kolom Duration pada sheet ORS
+  // Daftar halaman sidebar — tambahkan entry baru di sini untuk modul baru di masa depan.
+  NAV_ITEMS:[
+    { id:'overview',   label:'Overview',        icon:'fa-gauge-high',            title:'Overview', subtitle:'Ringkasan performa maintenance' },
+    { id:'activities', label:'Activities',      icon:'fa-clipboard-list',        title:'Activities', subtitle:'Input & riwayat shift log' },
+    { id:'sparepart',  label:'Sparepart',       icon:'fa-boxes-stacked',         title:'Sparepart', subtitle:'Monitoring stok sparepart' },
+    { id:'meter',      label:'Machine Meter',   icon:'fa-gauge',                 title:'Machine Meter', subtitle:'Running hour & jadwal PM' },
+    { id:'po',         label:'Purchase Orders', icon:'fa-file-invoice-dollar',   title:'Purchase Orders', subtitle:'Status pengadaan sparepart' }
+  ],
+  CHART_COLORS:['#0000FF','#4F7DFF','#16A34A','#F59E0B','#DC2626','#9333EA','#0D9488','#EA580C','#0891B2','#DB2777']
+};
+
+/* ---------------------------------------------------------------------- *
+ * 2. GLOBAL STATE
+ * ---------------------------------------------------------------------- */
+const STATE = {
+  user:null,
+  theme:'light',
+  sidebarCollapsed:false,
+  currentPage:'overview',
+  data:{ ors:[], activities:[], sparepart:[], meter:[], po:[], users:[] },
+  charts:{},
+  tables:{},
+  loaded:false
+};
+
+/* ---------------------------------------------------------------------- *
+ * 3. UTILITIES
+ * ---------------------------------------------------------------------- */
+const $  = (sel,ctx=document)=>ctx.querySelector(sel);
+const $$ = (sel,ctx=document)=>Array.from(ctx.querySelectorAll(sel));
+
+function escapeHtml(str){
+  return String(str ?? '').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function debounce(fn, delay=300){
+  let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), delay); };
+}
+
+/** Format nilai sel untuk ditampilkan pada tabel/kartu. */
+function formatCell(val){
+  if(val === null || val === undefined || val === '') return '<span style="color:var(--text-dim)">–</span>';
+  if(val instanceof Date) return formatDate(val);
+  if(typeof val === 'number') return val.toLocaleString('id-ID', { maximumFractionDigits:2 });
+  return escapeHtml(val);
+}
+
+function formatDate(d){
+  if(!(d instanceof Date) || isNaN(d)) return '–';
+  const dd = String(d.getDate()).padStart(2,'0');
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  return `${dd}/${mm}/${d.getFullYear()}`;
+}
+
+function toMinutes(v){
+  const n = Number(v)||0;
+  return CONFIG.DURATION_UNIT === 'hours' ? n*60 : n;
+}
+
+function formatDuration(totalMinutes){
+  const h = Math.floor(totalMinutes/60);
+  const m = Math.round(totalMinutes%60);
+  return `${h}j ${m}m`;
+}
+
+function isClosedStatus(status){
+  return /closed|done|selesai|complete/i.test(String(status||''));
+}
+
+function normKey(str){ return String(str||'').trim().toLowerCase(); }
+
+/** Nilai unik non-kosong sebuah field, dipakai untuk membangun opsi filter dropdown
+ *  secara dinamis dari data sheet asli (bukan menebak isinya di depan). */
+function uniqueValues(rows, field){
+  return [...new Set(rows.map(r=>String(getField(r,field)||'').trim()).filter(Boolean))].sort();
+}
+
+/** Ambil nilai field dari row secara case/space-insensitive terhadap nama kolom sheet. */
+function getField(row, ...names){
+  for(const n of names){
+    if(row[n] !== undefined) return row[n];
+    const found = Object.keys(row).find(k=>normKey(k)===normKey(n));
+    if(found) return row[found];
+  }
+  return '';
+}
+
+/* ---------------------------------------------------------------------- *
+ * 4. TOAST NOTIFICATIONS
+ * ---------------------------------------------------------------------- */
+function showToast(message, type='info', duration=3800){
+  const icons = { success:'fa-circle-check', error:'fa-circle-xmark', warning:'fa-triangle-exclamation', info:'fa-circle-info' };
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<i class="fa-solid ${icons[type]||icons.info} toast-icon"></i><div class="toast-msg">${escapeHtml(message)}</div><button class="toast-close"><i class="fa-solid fa-xmark"></i></button>`;
+  $('#toastContainer').appendChild(el);
+  const remove = ()=>{ el.style.animation='fadeIn .2s ease reverse'; setTimeout(()=>el.remove(),180); };
+  el.querySelector('.toast-close').addEventListener('click', remove);
+  setTimeout(remove, duration);
+}
+
+/* ---------------------------------------------------------------------- *
+ * 5. GVIZ DATA LAYER (Google Sheets)
+ * ---------------------------------------------------------------------- */
+function buildGvizUrl(sheetName){
+  // headers=1 memaksa baris pertama dianggap header — tanpa ini, GViz kadang gagal
+  // mendeteksi header secara otomatis pada sheet yang seluruh kolomnya bertipe teks
+  // (mis. tab User), sehingga label kolom kosong dan baris header ikut terbaca sebagai data.
+  return `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&headers=1&t=${Date.now()}`;
+}
+
+function parseGvizResponse(text){
+  const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?\s*$/);
+  if(!match) throw new Error('Format respons Google Sheets tidak valid. Pastikan spreadsheet sudah di-publish.');
+  const json = JSON.parse(match[1]);
+  if(json.status === 'error'){
+    const msg = json.errors?.[0]?.detailed_message || json.errors?.[0]?.message || 'Gagal membaca sheet.';
+    throw new Error(msg);
+  }
+  return json.table;
+}
+
+function gvizCellValue(cell){
+  if(!cell || cell.v === null || cell.v === undefined) return '';
+  if(typeof cell.v === 'string' && /^Date\(/.test(cell.v)){
+    const nums = cell.v.match(/-?\d+/g).map(Number);
+    return new Date(nums[0], nums[1], nums[2], nums[3]||0, nums[4]||0, nums[5]||0);
+  }
+  return cell.v;
+}
+
+/** Ambil tabel mentah GViz (cols + rows berisi objek cell asli) — dipakai saat butuh
+ *  akses posisional/tipe sel, mis. untuk membongkar sheet berbentuk pivot (lihat ORS). */
+async function fetchSheetRaw(sheetName){
+  if(!SPREADSHEET_ID){
+    throw new Error('SPREADSHEET_ID belum diatur. Silakan isi variabel SPREADSHEET_ID pada kode.');
+  }
+  const res = await fetch(buildGvizUrl(sheetName));
+  if(!res.ok) throw new Error(`Gagal mengambil sheet "${sheetName}" (HTTP ${res.status}).`);
+  const text = await res.text();
+  return parseGvizResponse(text);
+}
+
+/** Ambil seluruh baris sebuah sheet sebagai array of object {namaKolom: nilai}. */
+async function fetchSheet(sheetName){
+  const table = await fetchSheetRaw(sheetName);
+  const cols = table.cols.map((c,i)=> (c.label && c.label.trim()) || (c.id) || `col${i}`);
+  return table.rows.filter(Boolean).map(r=>{
+    const obj = {};
+    cols.forEach((colName,i)=>{ obj[colName] = gvizCellValue(r.c && r.c[i]); });
+    return obj;
+  });
+}
+
+/* ---------------------------------------------------------------------- *
+ * 6. DATA LOADERS
+ * ---------------------------------------------------------------------- */
+
+/** Tab ORS_* bukan log flat, melainkan pivot: kolom = tanggal, baris berbentuk pohon —
+ *  baris kategori (rata kiri, mis. "Technical"), lalu baris komponen ("├─ Filling A3 Speed")
+ *  berisi jam downtime per tanggal, diikuti baris detail ("│  Root Cause", "│  PIC", dst)
+ *  yang menyimpan teks detail insiden pada kolom tanggal yang sama.
+ *  parseOrsPivotSheet membongkar struktur ini jadi array event downtime flat, satu baris
+ *  per (komponen, tanggal) yang punya jam > 0 — bentuknya kompatibel dengan skema ORS asli
+ *  (Tanggal/Area/Mesin/Line/Downtime/Root Cause/.../Status/Duration) sehingga KPI & chart
+ *  Overview tidak perlu diubah, hanya loader ini. */
+const ORS_DETAIL_FIELDS = ['Root Cause','Temporary Action','Corrective Action','Preventive Action','Sparepart','PIC','Status'];
+
+function classifyOrsRow(label){
+  const raw = String(label ?? '').replace(/ /g,' ');
+  if(/^[├└]/.test(raw)) return { type:'component', name: raw.replace(/^[├└]─?\s*/,'').trim() };
+  if(/^│/.test(raw)) return { type:'detail', name: raw.replace(/^│\s*/,'').trim() };
+  if(!raw.trim()) return { type:'blank' };
+  return { type:'category', name: raw.trim() };
+}
+
+/** Parse "Jul 19" (tanpa tahun) jadi Date, mengasumsikan tahun berjalan; jika hasilnya
+ *  jauh di masa depan (>60 hari), mundurkan setahun — menangani laporan yang melewati
+ *  pergantian tahun (mis. dibuka awal Januari untuk data akhir Desember). */
+function parseOrsDateLabel(label){
+  const now = new Date();
+  const parsed = new Date(`${label} ${now.getFullYear()}`);
+  if(isNaN(parsed)) return null;
+  if(parsed - now > 60*86400000) parsed.setFullYear(parsed.getFullYear()-1);
+  return parsed;
+}
+
+function parseOrsPivotSheet(table, machineName){
+  const dateCols = table.cols.map((c,i)=>({ i, label:(c.label||'').trim() })).filter((c,idx)=> idx>=2 && c.label);
+  const events = [];
+  let currentCategory = '';
+  let currentComponent = null; // { name, rowIdx }
+  let detailRowIdx = {}; // field name (lower) -> row index
+
+  function flushComponent(){
+    if(!currentComponent) return;
+    const componentRow = table.rows[currentComponent.rowIdx];
+    dateCols.forEach(({ i:colIdx, label:colLabel })=>{
+      const hours = Number(gvizCellValue(componentRow.c && componentRow.c[colIdx])) || 0;
+      if(hours <= 0) return;
+      const tanggal = parseOrsDateLabel(colLabel);
+      const ev = {
+        Tanggal: tanggal, Area: currentCategory, Mesin: machineName,
+        Line: currentComponent.name, Downtime: currentComponent.name, Duration: hours*60
+      };
+      ORS_DETAIL_FIELDS.forEach(field=>{
+        const rIdx = detailRowIdx[field.toLowerCase()];
+        if(rIdx !== undefined){
+          const row = table.rows[rIdx];
+          ev[field] = gvizCellValue(row.c && row.c[colIdx]);
+        }
+      });
+      events.push(ev);
+    });
+  }
+
+  table.rows.forEach((row, rIdx)=>{
+    const label = gvizCellValue(row.c && row.c[0]);
+    const cls = classifyOrsRow(label);
+    if(cls.type==='category'){ flushComponent(); currentComponent=null; detailRowIdx={}; currentCategory=cls.name; }
+    else if(cls.type==='component'){ flushComponent(); currentComponent={ name:cls.name, rowIdx:rIdx }; detailRowIdx={}; }
+    else if(cls.type==='detail'){ detailRowIdx[cls.name.toLowerCase()] = rIdx; }
+  });
+  flushComponent();
+  return events;
+}
+
+/** Muat seluruh tab ORS per-mesin secara paralel lalu gabung jadi satu dataset flat.
+ *  Jika salah satu tab gagal dimuat (mis. belum dibuat), tab lain tetap tampil —
+ *  kegagalan dicatat ke console tanpa menggagalkan seluruh dashboard. */
+async function loadORS(){
+  const entries = Object.entries(CONFIG.ORS_SHEETS);
+  const results = await Promise.allSettled(entries.map(([sheetName])=> fetchSheetRaw(sheetName)));
+  const merged = [];
+  results.forEach((res, idx)=>{
+    const [sheetName, machineName] = entries[idx];
+    if(res.status === 'fulfilled'){
+      merged.push(...parseOrsPivotSheet(res.value, machineName));
+    }else{
+      console.error(`Gagal memuat tab "${sheetName}":`, res.reason);
+    }
+  });
+  STATE.data.ors = merged;
+  return STATE.data.ors;
+}
+async function loadActivities(){ STATE.data.activities = await fetchSheet(CONFIG.SHEETS.ACTIVITIES); return STATE.data.activities; }
+async function loadSparepart(){ STATE.data.sparepart = await fetchSheet(CONFIG.SHEETS.SPAREPART); return STATE.data.sparepart; }
+
+/** Tab "Running Hour" adalah pivot mingguan (kolom W27, W28, ...). Deteksi dua kolom
+ *  minggu terakhir secara dinamis, lalu simpan sebagai _latest/_prev/_delta per baris
+ *  agar UI tidak perlu tahu nama kolom minggu yang selalu berubah. */
+async function loadMeter(){
+  const rows = await fetchSheet(CONFIG.SHEETS.METER);
+  const weekCols = rows.length ? Object.keys(rows[0]).filter(k=>/^W\d+$/i.test(k)).sort((a,b)=> parseInt(a.slice(1))-parseInt(b.slice(1))) : [];
+  const latestKey = weekCols[weekCols.length-1];
+  const prevKey = weekCols[weekCols.length-2];
+  rows.forEach(r=>{
+    const latest = latestKey!==undefined ? Number(r[latestKey])||0 : 0;
+    const prev = prevKey!==undefined ? Number(r[prevKey])||0 : 0;
+    r._latestWeek = latestKey; r._prevWeek = prevKey;
+    r._latestValue = latest; r._prevValue = prev; r._delta = latest-prev;
+  });
+  STATE.data.meter = rows;
+  return STATE.data.meter;
+}
+
+/** Tab "PRPO" tidak punya kolom Status eksplisit — status pengadaan diturunkan dari
+ *  kolom tanggal mana yang sudah terisi (semakin lanjut prosesnya, semakin banyak
+ *  tanggal terisi). Disimpan sebagai kolom "Status" buatan agar UI (badge, filter,
+ *  KPI) bisa memperlakukannya sama seperti kolom asli. */
+function derivePoStatus(row){
+  if(String(getField(row,'Tgl Barang Datang')||'').trim()) return 'Received';
+  if(String(getField(row,'Confirm deliv date')||'').trim()) return 'On Delivery';
+  if(String(getField(row,'Tgl PO Release')||'').trim()) return 'Ordered';
+  if(String(getField(row,'Tanggal Release PR')||'').trim()) return 'Approved';
+  if(String(getField(row,'Tanggal PR')||'').trim()) return 'Requested';
+  return 'Draft';
+}
+async function loadPurchaseOrder(){
+  const rows = await fetchSheet(CONFIG.SHEETS.PO);
+  rows.forEach(r=>{ r['Status'] = derivePoStatus(r); });
+  STATE.data.po = rows;
+  return STATE.data.po;
+}
+async function loadUsers(){ STATE.data.users = await fetchSheet(CONFIG.SHEETS.USER); return STATE.data.users; }
+
+/** Muat seluruh sheet operasional secara paralel (dipanggil setelah login & saat refresh). */
+async function loadAllData(silent=false){
+  try{
+    if(!silent) toggleGlobalLoading(true);
+    const results = await Promise.allSettled([loadORS(), loadActivities(), loadSparepart(), loadMeter(), loadPurchaseOrder()]);
+    const failed = results.filter(r=>r.status==='rejected');
+    if(failed.length){
+      failed.forEach(f=>console.error(f.reason));
+      showToast(failed[0].reason.message || 'Sebagian data gagal dimuat.', 'error');
+    } else if(!silent){
+      showToast('Data berhasil dimuat.', 'success', 2200);
+    }
+    STATE.loaded = true;
+    renderCurrentPage();
+    updateNotifications();
+  }catch(err){
+    console.error(err);
+    showToast(err.message, 'error');
+  }finally{
+    if(!silent) toggleGlobalLoading(false);
+  }
+}
+
+function toggleGlobalLoading(state){
+  $$('.btn-primary#btnRefreshOverview, #btnRefresh, #btnRefreshSparepart, #btnRefreshMeter, #btnRefreshPO').forEach(b=>{
+    if(b) b.disabled = state;
+  });
+  const refreshIcon = $('#btnRefresh i');
+  if(refreshIcon) refreshIcon.classList.toggle('spin', state);
+}
+
+/* ---------------------------------------------------------------------- *
+ * 7. AUTH
+ * ---------------------------------------------------------------------- */
+const SESSION_KEY = 'ferrum_session';
+
+// localStorage bisa diblokir (private browsing, sandboxed frame, dsb) — bungkus agar tidak crash.
+const safeStorage = {
+  get(key){ try{ return localStorage.getItem(key); }catch{ return null; } },
+  set(key,val){ try{ localStorage.setItem(key,val); }catch{} },
+  remove(key){ try{ localStorage.removeItem(key); }catch{} }
+};
+
+async function login(username, password){
+  const users = await loadUsers();
+  const match = users.find(u=>{
+    const uName = normKey(getField(u,'Username'));
+    const uPass = String(getField(u,'Password')||'');
+    const status = normKey(getField(u,'Status'));
+    const activeOk = !status || status==='active' || status==='aktif';
+    return uName === normKey(username) && uPass === password && activeOk;
+  });
+  if(!match) throw new Error('Username, password, atau status akun tidak valid.');
+  const session = {
+    username:getField(match,'Username'), nama:getField(match,'Nama')||getField(match,'Username'),
+    role:getField(match,'Role')||'User', area:getField(match,'Area')||'-', ts:Date.now()
+  };
+  safeStorage.set(SESSION_KEY, JSON.stringify(session));
+  STATE.user = session;
+  return session;
+}
+
+function logout(){
+  safeStorage.remove(SESSION_KEY);
+  location.reload();
+}
+
+function restoreSession(){
+  try{
+    const raw = safeStorage.get(SESSION_KEY);
+    if(!raw) return null;
+    const session = JSON.parse(raw);
+    STATE.user = session;
+    return session;
+  }catch{ return null; }
+}
+
+function applyUserToUI(){
+  if(!STATE.user) return;
+  const initials = (STATE.user.nama||'?').trim().split(/\s+/).map(s=>s[0]).slice(0,2).join('').toUpperCase();
+  $('#sidebarAvatar').textContent = initials || '?';
+  $('#sidebarUserName').textContent = STATE.user.nama;
+  $('#sidebarUserRole').textContent = STATE.user.role;
+  const teknisiInput = $('#actTeknisi');
+  if(teknisiInput && !teknisiInput.value) teknisiInput.value = STATE.user.nama;
+}
+
+/* ---------------------------------------------------------------------- *
+ * 8. GENERIC DATA TABLE COMPONENT
+ * ---------------------------------------------------------------------- */
+function createDataTable({ id, columns, getData, filters=[], pageSize=8, onRowClick, exportName='data' }){
+  const root = document.getElementById(id);
+  if(!root) return null;
+  const state = { search:'', sort:{ key:null, dir:1 }, filterValues:{}, page:1 };
+
+  root.innerHTML = `
+    <div class="dt-toolbar">
+      <div class="dt-search"><i class="fa-solid fa-magnifying-glass"></i><input type="text" class="dt-search-input" placeholder="Cari..." /></div>
+      <div class="dt-filters"></div>
+      <div class="dt-toolbar-actions"><button class="btn btn-ghost btn-sm dt-export-btn"><i class="fa-solid fa-file-csv"></i> Export</button></div>
+    </div>
+    <div class="dt-scroll"><table class="dt-table"><thead><tr></tr></thead><tbody></tbody></table></div>
+    <div class="dt-footer"><span class="dt-info"></span><div class="dt-pagination"></div></div>`;
+
+  const searchInput = root.querySelector('.dt-search-input');
+  const filterWrap = root.querySelector('.dt-filters');
+  const theadRow = root.querySelector('thead tr');
+  const tbody = root.querySelector('tbody');
+  const infoEl = root.querySelector('.dt-info');
+  const pagerEl = root.querySelector('.dt-pagination');
+
+  // Header
+  theadRow.innerHTML = columns.map(c=>`<th data-key="${c.key}">${c.label} <i class="fa-solid fa-sort"></i></th>`).join('');
+  theadRow.querySelectorAll('th').forEach(th=>{
+    th.addEventListener('click', ()=>{
+      const key = th.dataset.key;
+      if(state.sort.key === key) state.sort.dir *= -1; else { state.sort.key = key; state.sort.dir = 1; }
+      render();
+    });
+  });
+
+  // Filters
+  filters.forEach(f=>{
+    const sel = document.createElement('select');
+    sel.innerHTML = `<option value="">${f.label}</option>` + f.options.map(o=>`<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('');
+    sel.addEventListener('change', ()=>{ state.filterValues[f.key] = sel.value; state.page = 1; render(); });
+    filterWrap.appendChild(sel);
+  });
+
+  // Search
+  searchInput.addEventListener('input', debounce(()=>{ state.search = searchInput.value.trim(); state.page = 1; render(); }, 250));
+
+  // Export
+  root.querySelector('.dt-export-btn').addEventListener('click', ()=>{
+    exportCSV(exportName, columns, getFiltered());
+  });
+
+  function getFiltered(){
+    let rows = getData() || [];
+    if(state.search){
+      const q = state.search.toLowerCase();
+      rows = rows.filter(r=> columns.some(c=> c.searchable !== false && String(r[c.key] ?? '').toLowerCase().includes(q)));
+    }
+    filters.forEach(f=>{
+      const val = state.filterValues[f.key];
+      if(val) rows = rows.filter(r=> String(r[f.key]||'') === val);
+    });
+    if(state.sort.key){
+      rows = [...rows].sort((a,b)=>{
+        let va = a[state.sort.key], vb = b[state.sort.key];
+        if(va instanceof Date && vb instanceof Date) return (va-vb)*state.sort.dir;
+        if(typeof va === 'number' && typeof vb === 'number') return (va-vb)*state.sort.dir;
+        return String(va??'').localeCompare(String(vb??''))*state.sort.dir;
+      });
+    }
+    return rows;
+  }
+
+  function render(){
+    const all = getFiltered();
+    const totalPages = Math.max(1, Math.ceil(all.length/pageSize));
+    if(state.page > totalPages) state.page = totalPages;
+    const start = (state.page-1)*pageSize;
+    const pageRows = all.slice(start, start+pageSize);
+
+    if(pageRows.length === 0){
+      tbody.innerHTML = `<tr><td colspan="${columns.length}">
+        <div class="state-block"><i class="fa-solid fa-inbox"></i><b>Tidak ada data</b><span>Coba ubah kata kunci pencarian atau filter.</span></div>
+      </td></tr>`;
+    }else{
+      tbody.innerHTML = pageRows.map((r,idx)=>`<tr ${onRowClick?'class="dt-row-clickable"':''} data-idx="${idx}">${
+        columns.map(c=> `<td>${c.render ? c.render(r) : formatCell(r[c.key])}</td>`).join('')
+      }</tr>`).join('');
+      if(onRowClick){
+        tbody.querySelectorAll('tr').forEach((tr,idx)=> tr.addEventListener('click', ()=> onRowClick(pageRows[idx])));
+      }
+    }
+
+    infoEl.textContent = all.length ? `Menampilkan ${start+1}-${Math.min(start+pageRows.length,all.length)} dari ${all.length} data` : 'Tidak ada data';
+
+    let pagerHtml = `<button class="dt-page-btn" data-p="prev" ${state.page<=1?'disabled':''}><i class="fa-solid fa-chevron-left"></i></button>`;
+    for(let p=1;p<=totalPages;p++){
+      if(p===1||p===totalPages||Math.abs(p-state.page)<=1) pagerHtml += `<button class="dt-page-btn ${p===state.page?'active':''}" data-p="${p}">${p}</button>`;
+      else if(Math.abs(p-state.page)===2) pagerHtml += `<span style="align-self:center;color:var(--text-dim);font-size:11px;">…</span>`;
+    }
+    pagerHtml += `<button class="dt-page-btn" data-p="next" ${state.page>=totalPages?'disabled':''}><i class="fa-solid fa-chevron-right"></i></button>`;
+    pagerEl.innerHTML = pagerHtml;
+    pagerEl.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const p = btn.dataset.p;
+        if(p==='prev') state.page = Math.max(1,state.page-1);
+        else if(p==='next') state.page = Math.min(totalPages,state.page+1);
+        else state.page = Number(p);
+        render();
+      });
+    });
+  }
+
+  render();
+  return { refresh:render, setSearch:(v)=>{ state.search=v; searchInput.value=v; state.page=1; render(); } };
+}
+
+/* ---------------------------------------------------------------------- *
+ * 9. CSV EXPORT
+ * ---------------------------------------------------------------------- */
+function exportCSV(filename, columns, rows){
+  if(!rows || !rows.length){ showToast('Tidak ada data untuk diekspor.', 'warning'); return; }
+  const esc = v=>{
+    let s = v instanceof Date ? formatDate(v) : String(v ?? '');
+    s = s.replace(/<[^>]*>/g,'');
+    if(/[",\n]/.test(s)) s = `"${s.replace(/"/g,'""')}"`;
+    return s;
+  };
+  const header = columns.map(c=>esc(c.label)).join(',');
+  const lines = rows.map(r=> columns.map(c=> esc(c.raw ? c.raw(r) : r[c.key])).join(','));
+  const csv = '﻿' + [header, ...lines].join('\n');
+  const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `${filename}_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  showToast('Export CSV berhasil.', 'success', 2000);
+}
+
+/* ---------------------------------------------------------------------- *
+ * 10. RENDER — OVERVIEW / DASHBOARD
+ * ---------------------------------------------------------------------- */
+function renderOverview(){
+  renderKpiCards();
+  renderCharts();
+  renderOrsTable();
+}
+
+function renderKpiCards(){
+  const ors = STATE.data.ors;
+  const activities = STATE.data.activities;
+  const grid = $('#kpiGrid');
+
+  if(!STATE.loaded){
+    grid.innerHTML = Array.from({length:8}).map(()=>`<div class="kpi-card"><div class="skel skel-line" style="width:40%"></div><div class="skel skel-line" style="width:70%;height:22px"></div><div class="skel skel-line" style="width:50%"></div></div>`).join('');
+    return;
+  }
+
+  const totalDowntimeMin = ors.reduce((s,r)=> s + toMinutes(getField(r,'Duration')), 0);
+  const totalEvents = ors.length;
+  const avgDuration = totalEvents ? totalDowntimeMin/totalEvents : 0;
+  const dates = ors.map(r=>getField(r,'Tanggal')).filter(d=>d instanceof Date);
+  let availability = 100;
+  if(dates.length){
+    const minD = new Date(Math.min(...dates)), maxD = new Date(Math.max(...dates));
+    const days = Math.max(1, Math.round((maxD-minD)/86400000)+1);
+    const planned = days * CONFIG.MACHINES.length * 24 * 60;
+    availability = Math.max(0, Math.min(100, ((planned-totalDowntimeMin)/planned)*100));
+  }
+  const allIssues = [...ors, ...activities];
+  const openIssue = allIssues.filter(r=> !isClosedStatus(getField(r,'Status'))).length;
+  const closedIssue = allIssues.filter(r=> isClosedStatus(getField(r,'Status'))).length;
+  const sparepartUsed = ors.filter(r=> String(getField(r,'Sparepart')||'').trim()).length;
+  const rootCauseCount = new Set(ors.map(r=>normKey(getField(r,'Root Cause'))).filter(Boolean)).size;
+  const correctiveCount = ors.filter(r=> String(getField(r,'Corrective Action')||'').trim()).length;
+  const preventiveCount = ors.filter(r=> String(getField(r,'Preventive Action')||'').trim()).length;
+
+  const cards = [
+    { label:'Total Downtime', value:formatDuration(totalDowntimeMin), sub:'Total durasi seluruh kejadian', icon:'fa-clock', cls:'bg-primary' },
+    { label:'Total Breakdown', value:totalEvents.toLocaleString('id-ID'), sub:'Jumlah kejadian downtime', icon:'fa-triangle-exclamation', cls:'bg-danger' },
+    { label:'Availability', value:availability.toFixed(1)+'%', sub:'Estimasi ketersediaan mesin', icon:'fa-gauge-high', cls:'bg-success' },
+    { label:'Total Duration', value:formatDuration(avgDuration), sub:'Rata-rata durasi / kejadian', icon:'fa-hourglass-half', cls:'bg-secondary' },
+    { label:'Open Issue', value:openIssue.toLocaleString('id-ID'), sub:'Belum selesai ditangani', icon:'fa-circle-exclamation', cls:'bg-warning' },
+    { label:'Closed Issue', value:closedIssue.toLocaleString('id-ID'), sub:'Sudah selesai ditangani', icon:'fa-circle-check', cls:'bg-success' },
+    { label:'Sparepart Digunakan', value:sparepartUsed.toLocaleString('id-ID'), sub:'Kejadian dengan sparepart', icon:'fa-boxes-stacked', cls:'bg-purple' },
+    { label:'Jumlah Root Cause', value:rootCauseCount.toLocaleString('id-ID'), sub:'Penyebab unik teridentifikasi', icon:'fa-magnifying-glass-chart', cls:'bg-teal' },
+    { label:'Corrective Action', value:correctiveCount.toLocaleString('id-ID'), sub:'Tindakan korektif tercatat', icon:'fa-screwdriver-wrench', cls:'bg-primary' },
+    { label:'Preventive Action', value:preventiveCount.toLocaleString('id-ID'), sub:'Tindakan preventif tercatat', icon:'fa-shield-heart', cls:'bg-secondary' }
+  ];
+
+  grid.innerHTML = cards.map(c=>`
+    <div class="kpi-card fade-up">
+      <div class="kpi-top"><div class="kpi-icon ${c.cls}"><i class="fa-solid ${c.icon}"></i></div></div>
+      <div class="kpi-value">${c.value}</div>
+      <div class="kpi-label">${c.label}</div>
+      <div class="kpi-sub">${c.sub}</div>
+    </div>`).join('');
+}
+
+function destroyChart(key){ if(STATE.charts[key]){ STATE.charts[key].destroy(); delete STATE.charts[key]; } }
+
+function baseChartOptions(extra={}){
+  const gridColor = getComputedStyle(document.body).getPropertyValue('--border').trim();
+  const textColor = getComputedStyle(document.body).getPropertyValue('--text-muted').trim();
+  return Object.assign({
+    responsive:true, maintainAspectRatio:false,
+    animation:{ duration:700, easing:'easeOutQuart' },
+    plugins:{ legend:{ labels:{ color:textColor, font:{ family:'Inter', size:11 } } } },
+    scales:{
+      x:{ grid:{ color:gridColor, display:false }, ticks:{ color:textColor, font:{ size:10 } } },
+      y:{ grid:{ color:gridColor }, ticks:{ color:textColor, font:{ size:10 } }, beginAtZero:true }
+    }
+  }, extra);
+}
+
+function renderCharts(){
+  if(typeof Chart === 'undefined') return;
+  const ors = STATE.data.ors;
+  const colors = CONFIG.CHART_COLORS;
+
+  // --- Downtime per Mesin ---
+  const byMesin = {};
+  CONFIG.MACHINES.forEach(m=> byMesin[m]=0);
+  ors.forEach(r=>{ const m=String(getField(r,'Mesin')||'Lainnya').trim(); byMesin[m]=(byMesin[m]||0)+toMinutes(getField(r,'Duration')); });
+  destroyChart('mesin');
+  STATE.charts.mesin = new Chart($('#chartMesin'), { type:'bar', data:{ labels:Object.keys(byMesin), datasets:[{ label:'Menit', data:Object.values(byMesin), backgroundColor:colors[0], borderRadius:8, maxBarThickness:38 }] }, options: baseChartOptions() });
+
+  // --- Downtime per Area ---
+  const byArea = {};
+  ors.forEach(r=>{ const a=String(getField(r,'Area')||'Lainnya').trim(); byArea[a]=(byArea[a]||0)+toMinutes(getField(r,'Duration')); });
+  destroyChart('area');
+  STATE.charts.area = new Chart($('#chartArea'), { type:'doughnut', data:{ labels:Object.keys(byArea), datasets:[{ data:Object.values(byArea), backgroundColor:colors, borderWidth:0 }] }, options: baseChartOptions({ scales:undefined, cutout:'62%' }) });
+
+  // --- Downtime per Hari (14 hari terakhir) ---
+  const dayMap = {};
+  ors.forEach(r=>{ const d=getField(r,'Tanggal'); if(d instanceof Date){ const key=formatDate(d); dayMap[key]=(dayMap[key]||0)+toMinutes(getField(r,'Duration')); } });
+  const sortedDays = Object.keys(dayMap).sort((a,b)=>{
+    const [da,ma,ya]=a.split('/').map(Number), [db,mb,yb]=b.split('/').map(Number);
+    return new Date(ya,ma-1,da) - new Date(yb,mb-1,db);
+  }).slice(-14);
+  destroyChart('harian');
+  STATE.charts.harian = new Chart($('#chartHarian'), { type:'line', data:{ labels:sortedDays, datasets:[{ label:'Menit', data:sortedDays.map(d=>dayMap[d]), borderColor:colors[0], backgroundColor:'rgba(0,0,255,.1)', fill:true, tension:.35, pointRadius:3 }] }, options: baseChartOptions() });
+
+  // --- Top Komponen Bermasalah (dari kolom Line, diisi loadORS() dengan nama komponen mesin) ---
+  const byComponent = {};
+  ors.forEach(r=>{ const c=String(getField(r,'Line')||'').trim(); if(c) byComponent[c]=(byComponent[c]||0)+toMinutes(getField(r,'Duration')); });
+  const topComponent = Object.entries(byComponent).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  destroyChart('component');
+  STATE.charts.component = new Chart($('#chartComponent'), { type:'bar', data:{ labels:topComponent.map(x=>x[0]), datasets:[{ label:'Menit', data:topComponent.map(x=>x[1]), backgroundColor:colors[3], borderRadius:8 }] }, options: baseChartOptions({ indexAxis:'y' }) });
+
+  // --- Top Root Cause ---
+  const byCause = {};
+  ors.forEach(r=>{ const c=String(getField(r,'Root Cause')||'').trim(); if(c) byCause[c]=(byCause[c]||0)+1; });
+  const topCause = Object.entries(byCause).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  destroyChart('rootcause');
+  STATE.charts.rootcause = new Chart($('#chartRootCause'), { type:'bar', data:{ labels:topCause.map(x=>x[0]), datasets:[{ label:'Kejadian', data:topCause.map(x=>x[1]), backgroundColor:colors[4], borderRadius:8 }] }, options: baseChartOptions({ indexAxis:'y' }) });
+
+  // --- Top Sparepart ---
+  const bySpare = {};
+  ors.forEach(r=>{ const s=String(getField(r,'Sparepart')||'').trim(); if(s) bySpare[s]=(bySpare[s]||0)+1; });
+  const topSpare = Object.entries(bySpare).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  destroyChart('topsparepart');
+  STATE.charts.topsparepart = new Chart($('#chartTopSparepart'), { type:'bar', data:{ labels:topSpare.map(x=>x[0]), datasets:[{ label:'Terpakai', data:topSpare.map(x=>x[1]), backgroundColor:colors[5], borderRadius:8 }] }, options: baseChartOptions({ indexAxis:'y' }) });
+
+  // --- Status Issue ---
+  const allIssues = [...ors, ...STATE.data.activities];
+  const openC = allIssues.filter(r=>!isClosedStatus(getField(r,'Status'))).length;
+  const closedC = allIssues.filter(r=>isClosedStatus(getField(r,'Status'))).length;
+  destroyChart('statusissue');
+  STATE.charts.statusissue = new Chart($('#chartStatusIssue'), { type:'doughnut', data:{ labels:['Open','Closed'], datasets:[{ data:[openC,closedC], backgroundColor:[colors[4],colors[2]], borderWidth:0 }] }, options: baseChartOptions({ scales:undefined, cutout:'68%' }) });
+
+  // --- Monthly Trend ---
+  const byMonth = {};
+  ors.forEach(r=>{ const d=getField(r,'Tanggal'); if(d instanceof Date){ const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; byMonth[key]=(byMonth[key]||0)+1; } });
+  const monthKeys = Object.keys(byMonth).sort();
+  const monthLabels = monthKeys.map(k=>{ const [y,m]=k.split('-'); return new Date(y,m-1,1).toLocaleDateString('id-ID',{month:'short',year:'2-digit'}); });
+  destroyChart('monthly');
+  STATE.charts.monthly = new Chart($('#chartMonthly'), { type:'line', data:{ labels:monthLabels, datasets:[{ label:'Kejadian', data:monthKeys.map(k=>byMonth[k]), borderColor:colors[1], backgroundColor:'rgba(79,125,255,.12)', fill:true, tension:.3, pointRadius:3 }] }, options: baseChartOptions() });
+}
+
+function renderOrsTable(){
+  if(STATE.tables.ors){ STATE.tables.ors.refresh(); return; }
+  STATE.tables.ors = createDataTable({
+    id:'tbl-ors', pageSize:8, exportName:'latest_downtime',
+    getData:()=> STATE.data.ors,
+    filters:[
+      { key:'Mesin', label:'Semua Mesin', options:CONFIG.MACHINES },
+      { key:'Status', label:'Semua Status', options:uniqueValues(STATE.data.ors,'Status') }
+    ],
+    columns:[
+      { key:'Tanggal', label:'Tanggal' },
+      { key:'Mesin', label:'Mesin' },
+      { key:'Downtime', label:'Downtime' },
+      { key:'Root Cause', label:'Root Cause' },
+      { key:'Corrective Action', label:'Action' },
+      { key:'Sparepart', label:'Sparepart' },
+      { key:'PIC', label:'PIC' },
+      { key:'Status', label:'Status', render:r=> statusBadge(getField(r,'Status')) },
+      { key:'Duration', label:'Durasi', render:r=> formatDuration(toMinutes(getField(r,'Duration'))) }
+    ],
+    onRowClick:(row)=> openDetailModal('Detail Downtime', row, ['Tanggal','Shift','Area','Line','Mesin','Downtime','Root Cause','Temporary Action','Corrective Action','Preventive Action','Sparepart','PIC','Status','Duration'])
+  });
+}
+
+function statusBadge(status){
+  const s = normKey(status);
+  let cls='badge-gray', label=status||'-';
+  if(/open/.test(s)) cls='badge-red';
+  else if(/progress/.test(s)) cls='badge-amber';
+  else if(/closed|done|selesai/.test(s)) cls='badge-green';
+  return `<span class="badge ${cls}">${escapeHtml(label)}</span>`;
+}
+
+/* ---------------------------------------------------------------------- *
+ * 11. RENDER — ACTIVITIES
+ * ---------------------------------------------------------------------- */
+function renderActivitiesHistory(){
+  if(STATE.tables.activities){ STATE.tables.activities.refresh(); return; }
+  STATE.tables.activities = createDataTable({
+    id:'tbl-activities', pageSize:8, exportName:'activities_history',
+    getData:()=> STATE.data.activities,
+    filters:[
+      { key:'Status', label:'Semua Status', options:uniqueValues(STATE.data.activities,'Status') },
+      { key:'Mesin', label:'Semua Mesin', options:uniqueValues(STATE.data.activities,'Mesin') }
+    ],
+    columns:[
+      { key:'Tanggal', label:'Tanggal' },
+      { key:'Shift', label:'Shift' },
+      { key:'Teknisi', label:'Teknisi' },
+      { key:'Area', label:'Area' },
+      { key:'Mesin', label:'Mesin' },
+      { key:'Issue', label:'Issue' },
+      { key:'Status', label:'Status', render:r=> statusBadge(getField(r,'Status')) }
+    ],
+    onRowClick:(row)=> openDetailModal('Detail Shift Log', row, ['Tanggal','Shift','Teknisi','Area','Mesin','Issue','Action','Status','Remark'])
+  });
+}
+
+function populateMesinDropdown(){
+  const sel = $('#actMesin');
+  if(!sel || sel.dataset.filled) return;
+  sel.innerHTML = '<option value="">Pilih mesin</option>' + CONFIG.MACHINES.map(m=>`<option>${escapeHtml(m)}</option>`).join('');
+  sel.dataset.filled = '1';
+}
+
+async function submitActivity(payload){
+  if(!WEBAPP_URL){ throw new Error('WEBAPP_URL belum diatur. Silakan isi variabel WEBAPP_URL pada kode.'); }
+  const res = await fetch(WEBAPP_URL, {
+    method:'POST',
+    headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  });
+  if(!res.ok) throw new Error(`Apps Script merespons HTTP ${res.status}.`);
+  return res;
+}
+
+/* ---------------------------------------------------------------------- *
+ * 12. RENDER — SPAREPART
+ * ---------------------------------------------------------------------- */
+// Sheet Sparepart tidak punya Minimum/Maximum Stock, jadi status "Low Stock" tidak bisa
+// dihitung. Sebagai gantinya: Stock<=0 dianggap habis, dan kolom "Distribution 6M" (nilai
+// Fast/Slow dari sheet) dipakai sebagai indikator kecepatan pergerakan barang.
+function movementStatus(row){
+  const stock = Number(getField(row,'Stock'))||0;
+  const dist = normKey(getField(row,'Distribution 6M'));
+  if(stock <= 0) return { label:'Out of Stock', cls:'badge-red' };
+  if(dist.includes('fast')) return { label:'Fast Moving', cls:'badge-green' };
+  if(dist.includes('slow')) return { label:'Slow Moving', cls:'badge-amber' };
+  return { label:'Normal', cls:'badge-gray' };
+}
+
+function renderSparepartKpi(){
+  const sp = STATE.data.sparepart;
+  const grid = $('#spKpiGrid');
+  const out = sp.filter(r=> movementStatus(r).label==='Out of Stock').length;
+  const fast = sp.filter(r=> movementStatus(r).label==='Fast Moving').length;
+  const slow = sp.filter(r=> movementStatus(r).label==='Slow Moving').length;
+  const totalValue = sp.reduce((s,r)=> s + (Number(getField(r,'Total Value'))||0), 0);
+  const cards = [
+    { label:'Total Item', value:sp.length.toLocaleString('id-ID'), icon:'fa-boxes-stacked', cls:'bg-primary' },
+    { label:'Total Nilai Inventory', value:'Rp '+totalValue.toLocaleString('id-ID'), icon:'fa-sack-dollar', cls:'bg-secondary' },
+    { label:'Fast Moving', value:fast.toLocaleString('id-ID'), icon:'fa-circle-check', cls:'bg-success' },
+    { label:'Slow Moving', value:slow.toLocaleString('id-ID'), icon:'fa-triangle-exclamation', cls:'bg-warning' },
+    { label:'Stok Habis', value:out.toLocaleString('id-ID'), icon:'fa-circle-xmark', cls:'bg-danger' }
+  ];
+  grid.innerHTML = cards.map(c=>`<div class="kpi-card"><div class="kpi-top"><div class="kpi-icon ${c.cls}"><i class="fa-solid ${c.icon}"></i></div></div><div class="kpi-value">${c.value}</div><div class="kpi-label">${c.label}</div></div>`).join('');
+}
+
+function renderSparepartTable(){
+  renderSparepartKpi();
+  if(STATE.tables.sparepart){ STATE.tables.sparepart.refresh(); return; }
+  STATE.tables.sparepart = createDataTable({
+    id:'tbl-sparepart', pageSize:8, exportName:'sparepart',
+    getData:()=> STATE.data.sparepart,
+    filters:[
+      { key:'Mesin', label:'Semua Mesin', options:uniqueValues(STATE.data.sparepart,'Mesin') },
+      { key:'Jenis Barang', label:'Semua Kategori', options:uniqueValues(STATE.data.sparepart,'Jenis Barang') }
+    ],
+    columns:[
+      { key:'No SAP', label:'Part Number' },
+      { key:'Nama Material', label:'Description' },
+      { key:'Jenis Barang', label:'Kategori' },
+      { key:'Mesin', label:'Mesin' },
+      { key:'Stock', label:'Stock' },
+      { key:'Satuan', label:'Unit' },
+      { key:'Racking', label:'Location' },
+      { key:'Last Lead Time Order on Days', label:'Lead Time (hari)' },
+      { key:'Status', label:'Status', searchable:false, render:r=>{
+          const s = movementStatus(r);
+          return `<span class="badge ${s.cls}">${s.label}</span>`;
+        } }
+    ],
+    onRowClick:(row)=> openDetailModal('Detail Sparepart', row, ['No SAP','Nama Material','Jenis Barang','Mesin','Area','Stock','Satuan','Harga @','Total Value','Last Lead Time Order on Days','Distribution 6M','Racking','Sloc','Mapping'])
+  });
+}
+
+/* ---------------------------------------------------------------------- *
+ * 13. RENDER — MACHINE METER
+ * ---------------------------------------------------------------------- */
+// Sheet "Running Hour" tidak punya Target PM, jadi progress-bar-ke-PM tidak bisa dihitung.
+// Halaman ini menampilkan pembacaan mingguan terakhir per komponen (kolom W27, W28, ...,
+// dideteksi otomatis oleh loadMeter()) beserta perubahannya dari minggu sebelumnya.
+function renderMeterKpi(){
+  const rows = STATE.data.meter;
+  const grid = $('#meterKpiGrid');
+  const areaCount = new Set(rows.map(r=>getField(r,'Area')).filter(Boolean)).size;
+  const naik = rows.filter(r=>r._delta>0).length;
+  const turun = rows.filter(r=>r._delta<0).length;
+  const stagnan = rows.filter(r=>r._delta===0).length;
+  const cards = [
+    { label:'Total Komponen', value:rows.length, icon:'fa-gauge', cls:'bg-primary' },
+    { label:'Total Area', value:areaCount, icon:'fa-diagram-project', cls:'bg-secondary' },
+    { label:'Naik Minggu Ini', value:naik, icon:'fa-arrow-trend-up', cls:'bg-success' },
+    { label:'Turun', value:turun, icon:'fa-arrow-trend-down', cls:'bg-danger' },
+    { label:'Stagnan', value:stagnan, icon:'fa-minus', cls:'bg-warning' }
+  ];
+  grid.innerHTML = cards.map(c=>`<div class="kpi-card"><div class="kpi-top"><div class="kpi-icon ${c.cls}"><i class="fa-solid ${c.icon}"></i></div></div><div class="kpi-value">${c.value}</div><div class="kpi-label">${c.label}</div></div>`).join('');
+  if(rows.length && rows[0]._latestWeek){
+    $('#meterSubtitle').textContent = `Running hour komponen per area — pembacaan terakhir: ${rows[0]._latestWeek}`;
+  }
+}
+
+function renderMeterPage(){
+  renderMeterKpi();
+  if(STATE.tables.meter){ STATE.tables.meter.refresh(); return; }
+  const latestLabel = STATE.data.meter[0]?._latestWeek || 'Terakhir';
+  const prevLabel = STATE.data.meter[0]?._prevWeek || 'Sebelumnya';
+  STATE.tables.meter = createDataTable({
+    id:'tbl-meter', pageSize:10, exportName:'running_hour',
+    getData:()=> STATE.data.meter,
+    filters:[ { key:'Area', label:'Semua Area', options:uniqueValues(STATE.data.meter,'Area') } ],
+    columns:[
+      { key:'Area', label:'Area' },
+      { key:'Nama Mesin', label:'Komponen' },
+      { key:'Unit', label:'Satuan' },
+      { key:'_prevValue', label:prevLabel, render:r=> formatCell(r._prevValue) },
+      { key:'_latestValue', label:latestLabel, render:r=> formatCell(r._latestValue) },
+      { key:'_delta', label:'Perubahan', render:r=>{
+          const d = r._delta||0;
+          const cls = d>0 ? 'text-success' : d<0 ? 'text-danger' : '';
+          const icon = d>0 ? 'fa-arrow-up' : d<0 ? 'fa-arrow-down' : 'fa-minus';
+          return `<span class="${cls}"><i class="fa-solid ${icon}"></i> ${Math.abs(d).toLocaleString('id-ID')}</span>`;
+        } }
+    ],
+    onRowClick:(row)=>{
+      const weekKeys = Object.keys(row).filter(k=>/^W\d+$/i.test(k)).sort((a,b)=>parseInt(a.slice(1))-parseInt(b.slice(1)));
+      openDetailModal('Detail Running Hour', row, ['Area','Nama Mesin','Unit', ...weekKeys]);
+    }
+  });
+}
+
+/* ---------------------------------------------------------------------- *
+ * 14. RENDER — PURCHASE ORDER
+ * ---------------------------------------------------------------------- */
+// Status bukan kolom asli sheet PRPO — dihitung oleh derivePoStatus() saat loadPurchaseOrder().
+const PO_STATUS_MAP = {
+  draft:'badge-gray', requested:'badge-gray', approved:'badge-blue', ordered:'badge-purple',
+  'on delivery':'badge-amber', received:'badge-green', cancelled:'badge-red'
+};
+
+function poBadge(status){
+  const cls = PO_STATUS_MAP[normKey(status)] || 'badge-gray';
+  return `<span class="badge ${cls}">${escapeHtml(status||'-')}</span>`;
+}
+
+function renderPoKpi(){
+  const po = STATE.data.po;
+  const grid = $('#poKpiGrid');
+  const received = po.filter(r=>getField(r,'Status')==='Received').length;
+  const onOrder = po.length - received;
+  const leadTimes = po.map(r=>Number(getField(r,'Lead Time PR-Barang Datang'))).filter(n=>n>0);
+  const avgLeadTime = leadTimes.length ? Math.round(leadTimes.reduce((a,b)=>a+b,0)/leadTimes.length) : 0;
+  const totalValue = po.reduce((s,r)=> s + (Number(getField(r,'Qty'))||0) * (Number(getField(r,'Harga PR /pcs'))||0), 0);
+  const cards = [
+    { label:'Total PR/PO', value:po.length.toLocaleString('id-ID'), icon:'fa-file-invoice-dollar', cls:'bg-primary' },
+    { label:'Sudah Diterima', value:received.toLocaleString('id-ID'), icon:'fa-circle-check', cls:'bg-success' },
+    { label:'Masih Berjalan', value:onOrder.toLocaleString('id-ID'), icon:'fa-truck-fast', cls:'bg-warning' },
+    { label:'Rata-rata Lead Time', value:avgLeadTime+' hari', icon:'fa-hourglass-half', cls:'bg-secondary' },
+    { label:'Total Nilai', value:'Rp '+totalValue.toLocaleString('id-ID'), icon:'fa-sack-dollar', cls:'bg-purple' }
+  ];
+  grid.innerHTML = cards.map(c=>`<div class="kpi-card"><div class="kpi-top"><div class="kpi-icon ${c.cls}"><i class="fa-solid ${c.icon}"></i></div></div><div class="kpi-value">${c.value}</div><div class="kpi-label">${c.label}</div></div>`).join('');
+}
+
+function renderPoTable(){
+  renderPoKpi();
+  if(STATE.tables.po){ STATE.tables.po.refresh(); return; }
+  STATE.tables.po = createDataTable({
+    id:'tbl-po', pageSize:8, exportName:'purchase_orders',
+    getData:()=> STATE.data.po,
+    filters:[
+      { key:'Status', label:'Semua Status', options:uniqueValues(STATE.data.po,'Status') },
+      { key:'Kategori', label:'Semua Kategori', options:uniqueValues(STATE.data.po,'Kategori') }
+    ],
+    columns:[
+      { key:'No PR', label:'PR' },
+      { key:'No PO', label:'PO' },
+      { key:'Deskripsi material', label:'Description' },
+      { key:'Qty', label:'Qty' },
+      { key:'UOM', label:'UOM' },
+      { key:'Kategori', label:'Kategori' },
+      { key:'Status', label:'Status', searchable:false, render:r=> poBadge(getField(r,'Status')) },
+      { key:'Lead Time PR-Barang Datang', label:'Lead Time (hari)' }
+    ],
+    onRowClick:(row)=> openDetailModal('Detail Purchase Order', row, ['No','No PR','No PO','No GR','Deskripsi material','Qty','UOM','Kategori','Status','Tanggal PR','Tanggal Release PR','Tgl PO Release','Confirm deliv date','Tgl Barang Datang','Lead Time PR','Lead Time PO','Lead Time PR-Barang Datang','WO','Purpose','Kode PPM','Matrial Group','Harga PR /pcs'])
+  });
+}
+
+/* ---------------------------------------------------------------------- *
+ * 15. DETAIL MODAL
+ * ---------------------------------------------------------------------- */
+function openDetailModal(title, row, fields){
+  $('#modalTitle').textContent = title;
+  $('#modalBody').innerHTML = fields.map(f=>`<div class="detail-row"><b>${escapeHtml(f)}</b><span>${formatCell(getField(row,f))}</span></div>`).join('');
+  $('#modalBackdrop').classList.add('show');
+}
+function closeDetailModal(){ $('#modalBackdrop').classList.remove('show'); }
+
+/* ---------------------------------------------------------------------- *
+ * 16. NOTIFICATIONS (derived, no separate sheet)
+ * ---------------------------------------------------------------------- */
+function updateNotifications(){
+  const list = [];
+  STATE.data.sparepart.forEach(r=>{
+    if(movementStatus(r).label==='Out of Stock'){
+      list.push({ icon:'fa-boxes-stacked', cls:'bg-danger', title:`Stok habis: ${getField(r,'No SAP')||getField(r,'Nama Material')}`, sub:getField(r,'Nama Material') });
+    }
+  });
+  const now = new Date();
+  STATE.data.po.forEach(r=>{
+    if(getField(r,'Status')==='Received') return;
+    const prDate = getField(r,'Tanggal PR');
+    if(prDate instanceof Date){
+      const days = Math.round((now-prDate)/86400000);
+      if(days>30) list.push({ icon:'fa-file-invoice-dollar', cls:'bg-warning', title:`PR ${getField(r,'No PR')||'-'} tertunda ${days} hari`, sub:getField(r,'Deskripsi material') });
+    }
+  });
+
+  const dot = $('#notifDot'); const count = $('#notifCount'); const listEl = $('#notifList');
+  if(list.length){ dot.classList.remove('hidden'); count.textContent = `${list.length} baru`; }
+  else{ dot.classList.add('hidden'); count.textContent = '0 baru'; }
+
+  listEl.innerHTML = list.length ? list.map(n=>`
+    <div class="notif-item"><div class="notif-icon ${n.cls}"><i class="fa-solid ${n.icon}"></i></div><div class="notif-text"><b>${escapeHtml(n.title)}</b><span>${escapeHtml(n.sub||'')}</span></div></div>
+  `).join('') : `<div class="state-block" style="padding:30px 16px;"><i class="fa-regular fa-bell-slash"></i><span>Tidak ada notifikasi</span></div>`;
+}
+
+/* ---------------------------------------------------------------------- *
+ * 17. PAGE ROUTER
+ * ---------------------------------------------------------------------- */
+function renderCurrentPage(){
+  switch(STATE.currentPage){
+    case 'overview': renderOverview(); break;
+    case 'activities':
+      populateMesinDropdown();
+      if($('#tab-history').classList.contains('active')) renderActivitiesHistory();
+      break;
+    case 'sparepart': renderSparepartTable(); break;
+    case 'meter': renderMeterPage(); break;
+    case 'po': renderPoTable(); break;
+  }
+}
+
+function navigateTo(pageId){
+  STATE.currentPage = pageId;
+  $$('.page').forEach(p=> p.classList.toggle('active', p.id===`page-${pageId}`));
+  $$('.nav-item[data-page]').forEach(n=> n.classList.toggle('active', n.dataset.page===pageId));
+  const meta = CONFIG.NAV_ITEMS.find(n=>n.id===pageId);
+  if(meta){ $('#topbarTitle').textContent = meta.title; $('#topbarSubtitle').textContent = meta.subtitle; }
+  $('#globalSearch').value = '';
+  closeAllDropdowns();
+  if(window.innerWidth<=1024) closeDrawer();
+  renderCurrentPage();
+}
+
+/* ---------------------------------------------------------------------- *
+ * 18. UI HELPERS — sidebar, drawer, dark mode, clock, fullscreen, print
+ * ---------------------------------------------------------------------- */
+function toggleSidebarCollapse(){
+  STATE.sidebarCollapsed = !STATE.sidebarCollapsed;
+  $('#sidebar').classList.toggle('collapsed', STATE.sidebarCollapsed);
+  safeStorage.set('ferrum_sidebar_collapsed', STATE.sidebarCollapsed ? '1':'0');
+}
+function openDrawer(){ $('#sidebar').classList.add('open'); $('#overlayDrawer').classList.add('show'); }
+function closeDrawer(){ $('#sidebar').classList.remove('open'); $('#overlayDrawer').classList.remove('show'); }
+
+function toggleDarkMode(){
+  STATE.theme = STATE.theme==='dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', STATE.theme);
+  safeStorage.set('ferrum_theme', STATE.theme);
+  $('#btnDark i').className = STATE.theme==='dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+  if(STATE.loaded) renderCharts();
+}
+
+function updateClock(){
+  const now = new Date();
+  $('#clockTime').textContent = now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  $('#clockDate').textContent = now.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
+function toggleFullscreen(){
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>showToast('Fullscreen tidak didukung browser ini.','warning'));
+  else document.exitFullscreen();
+}
+
+function printDashboard(){
+  $('#page-overview').classList.add('print-target');
+  window.print();
+  setTimeout(()=> $('#page-overview').classList.remove('print-target'), 500);
+}
+
+function closeAllDropdowns(){ $$('.dropdown-panel').forEach(p=>p.classList.remove('show')); }
+
+function addRipple(e, el){
+  const rect = el.getBoundingClientRect();
+  const span = document.createElement('span');
+  span.className='ripple-el';
+  span.style.left = (e.clientX-rect.left)+'px';
+  span.style.top = (e.clientY-rect.top)+'px';
+  el.style.position = el.style.position || 'relative';
+  el.appendChild(span);
+  setTimeout(()=>span.remove(), 600);
+}
+
+/* ---------------------------------------------------------------------- *
+ * 19. EVENT WIRING & INIT
+ * ---------------------------------------------------------------------- */
+function wireEvents(){
+  // Sidebar nav
+  $$('.nav-item[data-page]').forEach(btn=> btn.addEventListener('click', ()=> navigateTo(btn.dataset.page)));
+  $('#btnLogout').addEventListener('click', logout);
+  $('#btnCollapse').addEventListener('click', toggleSidebarCollapse);
+  $('#btnHamburger').addEventListener('click', openDrawer);
+  $('#overlayDrawer').addEventListener('click', closeDrawer);
+
+  // Topbar actions
+  $('#btnDark').addEventListener('click', toggleDarkMode);
+  $('#btnFullscreen').addEventListener('click', toggleFullscreen);
+  $('#btnPrint').addEventListener('click', printDashboard);
+  $('#btnRefresh').addEventListener('click', ()=> loadAllData(false));
+  $('#btnRefreshOverview').addEventListener('click', ()=> loadAllData(false));
+  $('#btnRefreshSparepart').addEventListener('click', ()=> loadAllData(false));
+  $('#btnRefreshMeter').addEventListener('click', ()=> loadAllData(false));
+  $('#btnRefreshPO').addEventListener('click', ()=> loadAllData(false));
+  $('#btnExportOverview').addEventListener('click', ()=>{
+    exportCSV('overview_downtime', [
+      {key:'Tanggal',label:'Tanggal'},{key:'Mesin',label:'Mesin'},{key:'Downtime',label:'Downtime'},
+      {key:'Root Cause',label:'Root Cause'},{key:'Status',label:'Status'},{key:'Duration',label:'Duration'}
+    ], STATE.data.ors);
+  });
+
+  $('#btnNotif').addEventListener('click', (e)=>{ e.stopPropagation(); $('#notifPanel').classList.toggle('show'); });
+  document.addEventListener('click', (e)=>{ if(!e.target.closest('.dropdown-panel') && !e.target.closest('#btnNotif')) closeAllDropdowns(); });
+
+  // Global search -> route to active table
+  $('#globalSearch').addEventListener('input', debounce((e)=>{
+    const val = e.target.value;
+    const map = { overview:'ors', sparepart:'sparepart', po:'po', activities:'activities' };
+    const key = map[STATE.currentPage];
+    if(key && STATE.tables[key]) STATE.tables[key].setSearch(val);
+  },250));
+
+  // Tabs (Activities)
+  $$('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      $$('.tab-btn').forEach(b=>b.classList.remove('active'));
+      $$('.tab-content').forEach(c=>c.classList.remove('active'));
+      btn.classList.add('active');
+      $(`#tab-${btn.dataset.tab}`).classList.add('active');
+      if(btn.dataset.tab==='history') renderActivitiesHistory();
+    });
+  });
+
+  // Modal
+  $('#modalCloseBtn').addEventListener('click', closeDetailModal);
+  $('#modalBackdrop').addEventListener('click', (e)=>{ if(e.target.id==='modalBackdrop') closeDetailModal(); });
+
+  // Ripple on all buttons
+  document.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.btn, .nav-item, .icon-btn');
+    if(btn) addRipple(e, btn);
+  });
+
+  // Password visibility toggle
+  $('#togglePassBtn').addEventListener('click', ()=>{
+    const input = $('#loginPassword');
+    const showing = input.type==='text';
+    input.type = showing ? 'password' : 'text';
+    $('#togglePassBtn').className = showing ? 'fa-solid fa-eye toggle-pass' : 'fa-solid fa-eye-slash toggle-pass';
+  });
+
+  // Login form
+  $('#loginForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const btn = $('#loginSubmitBtn');
+    const errBox = $('#loginError');
+    errBox.classList.remove('show');
+    btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner spin"></i> <span>Memproses…</span>';
+    try{
+      await login($('#loginUsername').value.trim(), $('#loginPassword').value);
+      await onLoginSuccess();
+    }catch(err){
+      errBox.querySelector('span').textContent = err.message;
+      errBox.classList.add('show');
+    }finally{
+      btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> <span>Masuk</span>';
+    }
+  });
+
+  // Activity form submit
+  $('#activityForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const btn = $('#btnSubmitActivity');
+    const payload = {
+      Tanggal: $('#actTanggal').value, Shift: $('#actShift').value, Teknisi: $('#actTeknisi').value,
+      Area: $('#actArea').value, Mesin: $('#actMesin').value, Issue: $('#actIssue').value,
+      Action: $('#actAction').value, Status: $('#actStatus').value, Remark: $('#actRemark').value
+    };
+    btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner spin"></i> Mengirim…';
+    try{
+      await submitActivity(payload);
+      showToast('Shift log berhasil disimpan.', 'success');
+      STATE.data.activities.unshift({ ...payload, Tanggal:new Date(payload.Tanggal) });
+      $('#activityForm').reset();
+      $('#actTeknisi').value = STATE.user?.nama || '';
+      if(STATE.tables.activities) STATE.tables.activities.refresh();
+    }catch(err){
+      showToast(err.message, 'error');
+    }finally{
+      btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Simpan';
+    }
+  });
+
+  // Keyboard: ESC closes modal/drawer/dropdown
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='Escape'){ closeDetailModal(); closeDrawer(); closeAllDropdowns(); }
+  });
+
+  window.addEventListener('resize', ()=>{ if(window.innerWidth>1024) closeDrawer(); });
+}
+
+async function onLoginSuccess(){
+  $('#loginScreen').classList.add('hidden');
+  $('#appShell').classList.remove('hidden');
+  applyUserToUI();
+  await loadAllData(false);
+  setInterval(()=> loadAllData(true), CONFIG.AUTO_REFRESH_MS);
+}
+
+function applyStoredPreferences(){
+  const theme = safeStorage.get('ferrum_theme');
+  if(theme==='dark'){ STATE.theme='dark'; document.documentElement.setAttribute('data-theme','dark'); $('#btnDark i').className='fa-solid fa-sun'; }
+  const collapsed = safeStorage.get('ferrum_sidebar_collapsed');
+  if(collapsed==='1'){ STATE.sidebarCollapsed=true; $('#sidebar').classList.add('collapsed'); }
+}
+
+async function init(){
+  $('#loginYear').textContent = new Date().getFullYear();
+  applyStoredPreferences();
+  wireEvents();
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  const session = restoreSession();
+  $('#loadingScreen').classList.add('hide');
+
+  if(session){
+    $('#appShell').classList.remove('hidden');
+    applyUserToUI();
+    await loadAllData(false);
+    setInterval(()=> loadAllData(true), CONFIG.AUTO_REFRESH_MS);
+  }else{
+    $('#loginScreen').classList.remove('hidden');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
