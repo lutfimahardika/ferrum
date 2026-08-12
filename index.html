@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ferrum — Maintenance CMS</title>
-<meta name="description" content="ferrum — Computerized Maintenance Management System" />
+<title>Ferrum</title>
+<meta name="description" content="Ferrum" />
 
 <!-- Google Fonts: Plus Jakarta Sans (display) + Inter (body) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,7 +16,7 @@
 
 <style>
 /* ==========================================================================
-   ferrum — Design Tokens
+   Ferrum — Design Tokens
    ========================================================================== */
 :root{
   --primary:#0000FF;
@@ -148,6 +148,8 @@ a{color:inherit;}
 }
 .input-group input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(0,0,255,.12);}
 .input-group .toggle-pass{left:auto;right:14px;cursor:pointer;pointer-events:all;}
+.login-remember{display:flex;align-items:center;gap:8px;margin-top:16px;font-size:12.5px;color:var(--text-muted);cursor:pointer;user-select:none;}
+.login-remember input{width:15px;height:15px;accent-color:var(--primary);cursor:pointer;flex-shrink:0;}
 .login-error{
   margin-top:14px;padding:10px 12px;background:var(--danger-bg);color:var(--danger);border-radius:var(--radius-xs);
   font-size:12.5px;display:none;align-items:center;gap:8px;
@@ -192,7 +194,6 @@ a{color:inherit;}
 .sidebar-logo-text{min-width:0;}
 .sidebar.collapsed .sidebar-logo-text{display:none;}
 .sidebar-logo-text b{font-family:var(--font-display);font-weight:800;font-size:16px;letter-spacing:.5px;display:block;}
-.sidebar-logo-text span{font-family:var(--font-display);font-style:italic;font-weight:300;font-size:10px;color:var(--text-dim);letter-spacing:.5px;text-transform:uppercase;}
 
 .sidebar-nav{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:3px;}
 .nav-section-label{font-family:var(--font-display);font-size:10px;font-weight:300;font-style:italic;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;padding:10px 12px 6px;}
@@ -234,16 +235,12 @@ a{color:inherit;}
 }
 .topbar-hamburger{display:flex;background:none;border:none;color:var(--text-muted);font-size:18px;}
 @media(min-width:1025px){.topbar-hamburger{display:none;}}
-.topbar-title{min-width:0;}
-.topbar-title h2{font-size:17px;}
-.topbar-title span{font-family:var(--font-display);font-style:italic;font-weight:400;font-size:11.5px;color:var(--text-dim);}
 .topbar-search{
-  flex:1;max-width:340px;display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--border);
+  flex:1;display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--border);
   border-radius:99px;padding:9px 16px;color:var(--text-dim);
 }
 .topbar-search input{flex:1;border:none;background:none;outline:none;font-size:13px;color:var(--text);}
 @media(max-width:768px){.topbar-search{display:none;}}
-.topbar-spacer{flex:1;}
 .topbar-actions{display:flex;align-items:center;gap:6px;}
 .icon-btn{
   width:38px;height:38px;border-radius:50%;border:none;background:none;color:var(--text-muted);font-size:15px;
@@ -395,13 +392,6 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
 .form-field textarea{resize:vertical;min-height:80px;}
 .form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;padding-top:18px;border-top:1px solid var(--border);}
 
-/* ---- Tabs ---- */
-.tabs{display:flex;gap:4px;background:var(--bg);padding:4px;border-radius:var(--radius-sm);width:fit-content;margin-bottom:20px;}
-.tab-btn{padding:9px 18px;border:none;background:none;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--text-muted);transition:all .2s;}
-.tab-btn.active{background:var(--card);color:var(--primary);}
-.tab-content{display:none;}
-.tab-content.active{display:block;animation:fadeIn .3s ease;}
-
 /* ---- Toast ---- */
 #toastContainer{position:fixed;bottom:22px;right:22px;z-index:9500;display:flex;flex-direction:column;gap:10px;max-width:340px;}
 .toast{
@@ -423,6 +413,7 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
 .modal-backdrop{position:fixed;inset:0;background:rgba(15,17,26,.55);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;}
 .modal-backdrop.show{display:flex;animation:fadeIn .2s ease;}
 .modal-box{background:var(--card);border-radius:var(--radius);width:100%;max-width:520px;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:fadeUp .3s ease both;}
+.modal-box--wide{max-width:640px;}
 .modal-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--border);}
 .modal-head h3{font-size:15px;}
 .modal-body{padding:20px 22px;}
@@ -460,8 +451,8 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
      LOADING SCREEN
      ========================================================================== -->
 <div id="loadingScreen">
-  <div class="loading-logo"><i class="fa-solid fa-industry"></i> ferrum</div>
-  <div class="loading-sub">Memuat Maintenance CMS…</div>
+  <div class="loading-logo"><i class="fa-solid fa-industry"></i> Ferrum</div>
+  <div class="loading-sub" data-i18n="app_loading">Memuat data…</div>
   <div class="loading-bar"><span></span></div>
 </div>
 
@@ -472,8 +463,7 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
   <div class="login-card">
     <div class="login-brand">
       <div class="login-brand-badge"><i class="fa-solid fa-industry"></i></div>
-      <h1>ferrum</h1>
-      <p>Maintenance Management System</p>
+      <h1>Ferrum</h1>
     </div>
     <form class="login-form" id="loginForm" autocomplete="off">
       <label for="loginUsername">Username</label>
@@ -487,12 +477,16 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
         <input type="password" id="loginPassword" placeholder="Masukkan password" required />
         <i class="fa-solid fa-eye toggle-pass" id="togglePassBtn"></i>
       </div>
+      <label class="login-remember" for="loginRemember">
+        <input type="checkbox" id="loginRemember" checked />
+        <span>Tetap masuk di perangkat ini</span>
+      </label>
       <div class="login-error" id="loginError"><i class="fa-solid fa-triangle-exclamation"></i><span></span></div>
       <button type="submit" class="btn-login" id="loginSubmitBtn">
         <i class="fa-solid fa-right-to-bracket"></i> <span>Masuk</span>
       </button>
     </form>
-    <div class="login-foot">ferrum CMS &copy; <span id="loginYear"></span> — Powered by Google Sheets</div>
+    <div class="login-foot">Ferrum &copy; <span id="loginYear"></span> — Powered by Google Sheets</div>
   </div>
 </div>
 
@@ -507,14 +501,14 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
     <button class="btn-collapse" id="btnCollapse"><i class="fa-solid fa-chevron-left"></i></button>
     <div class="sidebar-head">
       <div class="sidebar-logo-badge"><i class="fa-solid fa-industry"></i></div>
-      <div class="sidebar-logo-text"><b>ferrum</b><span>Maintenance CMS</span></div>
+      <div class="sidebar-logo-text"><b>Ferrum</b></div>
     </div>
     <nav class="sidebar-nav" id="sidebarNav">
       <span class="nav-section-label">Menu Utama</span>
       <button class="nav-item active" data-page="overview"><i class="fa-solid fa-gauge-high"></i><span class="nav-label">Overview</span></button>
       <button class="nav-item" data-page="activities"><i class="fa-solid fa-clipboard-list"></i><span class="nav-label">Activities</span></button>
-      <button class="nav-item" data-page="sparepart"><i class="fa-solid fa-boxes-stacked"></i><span class="nav-label">Sparepart</span></button>
-      <button class="nav-item" data-page="meter"><i class="fa-solid fa-gauge"></i><span class="nav-label">Machine Meter</span></button>
+      <button class="nav-item" data-page="sparepart"><i class="fa-solid fa-boxes-stacked"></i><span class="nav-label">Parts &amp; Inventory</span></button>
+      <button class="nav-item" data-page="meter"><i class="fa-solid fa-gauge"></i><span class="nav-label">Meters</span></button>
       <button class="nav-item" data-page="po"><i class="fa-solid fa-file-invoice-dollar"></i><span class="nav-label">Purchase Orders</span></button>
       <span class="nav-section-label">Akun</span>
       <button class="nav-item" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i><span class="nav-label">Logout</span></button>
@@ -532,11 +526,6 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
     <!-- TOPBAR -->
     <header class="topbar">
       <button class="topbar-hamburger" id="btnHamburger"><i class="fa-solid fa-bars"></i></button>
-      <div class="topbar-title">
-        <h2 id="topbarTitle">Overview</h2>
-        <span id="topbarSubtitle">Ringkasan performa maintenance</span>
-      </div>
-      <div class="topbar-spacer"></div>
       <div class="topbar-search">
         <i class="fa-solid fa-magnifying-glass"></i>
         <input type="text" id="globalSearch" placeholder="Cari data…" />
@@ -595,48 +584,18 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
       <!-- ============================= ACTIVITIES ============================= -->
       <section class="page" id="page-activities">
         <div class="page-head">
-          <div><h1>Activities</h1><p>Input &amp; riwayat shift log teknisi</p></div>
-        </div>
-        <div class="tabs">
-          <button class="tab-btn active" data-tab="input">Input</button>
-          <button class="tab-btn" data-tab="history">History</button>
-        </div>
-
-        <div class="tab-content active" id="tab-input">
-          <div class="panel">
-            <form id="activityForm" class="form-grid">
-              <div class="form-field"><label>Tanggal</label><input type="date" id="actTanggal" required /></div>
-              <div class="form-field"><label>Shift</label>
-                <select id="actShift" required><option value="">Pilih shift</option><option>Shift 1</option><option>Shift 2</option><option>Shift 3</option></select>
-              </div>
-              <div class="form-field"><label>Teknisi</label><input type="text" id="actTeknisi" placeholder="Nama teknisi" required /></div>
-              <div class="form-field"><label>Area</label><input type="text" id="actArea" placeholder="Area / line" required /></div>
-              <div class="form-field"><label>Mesin</label>
-                <select id="actMesin" required><option value="">Pilih mesin</option></select>
-              </div>
-              <div class="form-field"><label>Status</label>
-                <select id="actStatus" required><option value="">Pilih status</option><option>Open</option><option>In Progress</option><option>Closed</option></select>
-              </div>
-              <div class="form-field" style="grid-column:1/-1;"><label>Issue</label><textarea id="actIssue" placeholder="Deskripsikan issue" required></textarea></div>
-              <div class="form-field" style="grid-column:1/-1;"><label>Action</label><textarea id="actAction" placeholder="Tindakan yang dilakukan"></textarea></div>
-              <div class="form-field" style="grid-column:1/-1;"><label>Remark</label><textarea id="actRemark" placeholder="Catatan tambahan"></textarea></div>
-              <div class="form-actions" style="grid-column:1/-1;">
-                <button type="reset" class="btn btn-outline">Reset</button>
-                <button type="submit" class="btn btn-primary" id="btnSubmitActivity"><i class="fa-solid fa-paper-plane"></i> Simpan</button>
-              </div>
-            </form>
+          <div><h1>Activities</h1><p>Riwayat shift log teknisi</p></div>
+          <div class="page-head-actions">
+            <button class="btn btn-primary btn-sm" id="btnOpenActivityModal"><i class="fa-solid fa-plus"></i> Tambahkan Aktivitas</button>
           </div>
         </div>
-
-        <div class="tab-content" id="tab-history">
-          <div class="panel"><div id="tbl-activities"></div></div>
-        </div>
+        <div class="panel"><div id="tbl-activities"></div></div>
       </section>
 
       <!-- ============================= SPAREPART ============================= -->
       <section class="page" id="page-sparepart">
         <div class="page-head">
-          <div><h1>Sparepart</h1><p>Monitoring stok sparepart maintenance</p></div>
+          <div><h1>Parts &amp; Inventory</h1><p>Monitoring stok sparepart maintenance</p></div>
           <div class="page-head-actions"><button class="btn btn-primary btn-sm" id="btnRefreshSparepart"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
         </div>
         <div class="grid-kpi" id="spKpiGrid" style="margin-bottom:18px;"></div>
@@ -646,7 +605,7 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
       <!-- ============================= METER ============================= -->
       <section class="page" id="page-meter">
         <div class="page-head">
-          <div><h1>Machine Meter</h1><p id="meterSubtitle">Running hour komponen per area (mingguan)</p></div>
+          <div><h1>Meters</h1><p id="meterSubtitle">Running hour komponen per area (mingguan)</p></div>
           <div class="page-head-actions"><button class="btn btn-primary btn-sm" id="btnRefreshMeter"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
         </div>
         <div class="grid-kpi" id="meterKpiGrid" style="margin-bottom:18px;"></div>
@@ -675,12 +634,42 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
   </div>
 </div>
 
+<!-- Activity Input Modal -->
+<div class="modal-backdrop" id="activityModalBackdrop">
+  <div class="modal-box modal-box--wide">
+    <div class="modal-head"><h3>Tambahkan Aktivitas</h3><button class="modal-close" id="activityModalCloseBtn"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="modal-body">
+      <form id="activityForm" class="form-grid">
+        <div class="form-field"><label>Tanggal</label><input type="date" id="actTanggal" required /></div>
+        <div class="form-field"><label>Shift</label>
+          <select id="actShift" required><option value="">Pilih shift</option><option>Shift 1</option><option>Shift 2</option><option>Shift 3</option></select>
+        </div>
+        <div class="form-field"><label>Teknisi</label><input type="text" id="actTeknisi" placeholder="Nama teknisi" required /></div>
+        <div class="form-field"><label>Area</label><input type="text" id="actArea" placeholder="Area / line" required /></div>
+        <div class="form-field"><label>Mesin</label>
+          <select id="actMesin" required><option value="">Pilih mesin</option></select>
+        </div>
+        <div class="form-field"><label>Status</label>
+          <select id="actStatus" required><option value="">Pilih status</option><option>Open</option><option>In Progress</option><option>Closed</option></select>
+        </div>
+        <div class="form-field" style="grid-column:1/-1;"><label>Issue</label><textarea id="actIssue" placeholder="Deskripsikan issue" required></textarea></div>
+        <div class="form-field" style="grid-column:1/-1;"><label>Action</label><textarea id="actAction" placeholder="Tindakan yang dilakukan"></textarea></div>
+        <div class="form-field" style="grid-column:1/-1;"><label>Remark</label><textarea id="actRemark" placeholder="Catatan tambahan"></textarea></div>
+        <div class="form-actions" style="grid-column:1/-1;">
+          <button type="button" class="btn btn-outline" id="btnCancelActivity">Batal</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitActivity"><i class="fa-solid fa-paper-plane"></i> Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- Toasts -->
 <div id="toastContainer"></div>
 
 <script>
 /* ==========================================================================
-   ferrum — Maintenance CMS
+   Ferrum
    Single-file vanilla JS application. No backend, no build step.
    Data source : Google Sheets (published) via GViz JSON endpoint.
    Write path  : Google Apps Script Web App (Activities input).
@@ -714,8 +703,8 @@ const CONFIG = {
   NAV_ITEMS:[
     { id:'overview',   label:'Overview',        icon:'fa-gauge-high',            title:'Overview', subtitle:'Ringkasan performa maintenance' },
     { id:'activities', label:'Activities',      icon:'fa-clipboard-list',        title:'Activities', subtitle:'Input & riwayat shift log' },
-    { id:'sparepart',  label:'Sparepart',       icon:'fa-boxes-stacked',         title:'Sparepart', subtitle:'Monitoring stok sparepart' },
-    { id:'meter',      label:'Machine Meter',   icon:'fa-gauge',                 title:'Machine Meter', subtitle:'Running hour & jadwal PM' },
+    { id:'sparepart',  label:'Parts & Inventory', icon:'fa-boxes-stacked',       title:'Parts & Inventory', subtitle:'Monitoring stok sparepart' },
+    { id:'meter',      label:'Meters',          icon:'fa-gauge',                 title:'Meters', subtitle:'Running hour & jadwal PM' },
     { id:'po',         label:'Purchase Orders', icon:'fa-file-invoice-dollar',   title:'Purchase Orders', subtitle:'Status pengadaan sparepart' }
   ],
   CHART_COLORS:['#0000FF','#4F7DFF','#16A34A','#F59E0B','#DC2626','#9333EA','#0D9488','#EA580C','#0891B2','#DB2777']
@@ -727,6 +716,7 @@ const CONFIG = {
 const STATE = {
   user:null,
   theme:'light',
+  lang:'id',
   sidebarCollapsed:false,
   currentPage:'overview',
   data:{ ors:[], activities:[], sparepart:[], meter:[], po:[], users:[] },
@@ -795,6 +785,187 @@ function getField(row, ...names){
     if(found) return row[found];
   }
   return '';
+}
+
+/* ---------------------------------------------------------------------- *
+ * 3b. INTERNATIONALIZATION (i18n) — Bahasa Indonesia (default) / English
+ * ---------------------------------------------------------------------- */
+const I18N = {
+  id:{
+    app_loading:'Memuat data…', powered_by:'Powered by Google Sheets',
+    login_username_label:'Username', login_username_placeholder:'Masukkan username',
+    login_password_label:'Password', login_password_placeholder:'Masukkan password',
+    login_remember:'Tetap masuk di perangkat ini', login_submit:'Masuk', login_submit_loading:'Memproses…',
+    nav_section_main:'Menu Utama', nav_section_account:'Akun',
+    nav_overview:'Overview', nav_activities:'Activities', nav_parts:'Parts & Inventory',
+    nav_meters:'Meters', nav_po:'Purchase Orders', nav_settings:'Settings', nav_logout:'Logout',
+    search_placeholder:'Cari data…',
+    tooltip_refresh:'Refresh data', tooltip_notif:'Notifikasi', tooltip_dark:'Dark mode',
+    tooltip_fullscreen:'Fullscreen', tooltip_print:'Print dashboard',
+    notif_title:'Notifikasi', notif_count:(n)=>`${n} baru`, notif_empty:'Tidak ada notifikasi',
+    btn_export_csv:'Export CSV', btn_refresh:'Refresh', btn_add_activity:'Tambahkan Aktivitas',
+    btn_cancel:'Batal', btn_save:'Simpan', btn_save_loading:'Mengirim…', btn_export:'Export',
+    page_overview_title:'Overview Dashboard',
+    page_overview_subtitle:'Ringkasan downtime & performa mesin — auto-refresh setiap 60 detik',
+    chart_mesin_title:'Downtime per Mesin', chart_mesin_sub:'Total menit',
+    chart_area_title:'Downtime per Kategori', chart_area_sub:'Total menit',
+    chart_harian_title:'Downtime per Hari', chart_harian_sub:'14 hari terakhir',
+    chart_component_title:'Top Komponen Bermasalah', chart_component_sub:'5 teratas',
+    chart_rootcause_title:'Top Root Cause', chart_rootcause_sub:'5 teratas',
+    chart_sparepart_title:'Top Sparepart Terpakai', chart_sparepart_sub:'5 teratas',
+    chart_status_title:'Status Issue', chart_status_sub:'Open vs Closed',
+    chart_monthly_title:'Monthly Trend', chart_monthly_sub:'Jumlah kejadian / bulan',
+    overview_latest_downtime:'Latest Downtime', overview_latest_downtime_sub:'Data dari sheet ORS',
+    kpi_total_downtime:'Total Downtime', kpi_total_downtime_sub:'Total durasi seluruh kejadian',
+    kpi_total_breakdown:'Total Breakdown', kpi_total_breakdown_sub:'Jumlah kejadian downtime',
+    kpi_availability:'Availability', kpi_availability_sub:'Estimasi ketersediaan mesin',
+    kpi_total_duration:'Total Duration', kpi_total_duration_sub:'Rata-rata durasi / kejadian',
+    kpi_open_issue:'Open Issue', kpi_open_issue_sub:'Belum selesai ditangani',
+    kpi_closed_issue:'Closed Issue', kpi_closed_issue_sub:'Sudah selesai ditangani',
+    kpi_sparepart_used:'Sparepart Digunakan', kpi_sparepart_used_sub:'Kejadian dengan sparepart',
+    kpi_root_cause:'Jumlah Root Cause', kpi_root_cause_sub:'Penyebab unik teridentifikasi',
+    kpi_corrective:'Corrective Action', kpi_corrective_sub:'Tindakan korektif tercatat',
+    kpi_preventive:'Preventive Action', kpi_preventive_sub:'Tindakan preventif tercatat',
+    unit_hour_short:'j', unit_minute_short:'m',
+    page_activities_title:'Activities', page_activities_subtitle:'Riwayat shift log teknisi',
+    modal_add_activity_title:'Tambahkan Aktivitas',
+    form_tanggal_label:'Tanggal', form_shift_label:'Shift', form_shift_placeholder:'Pilih shift',
+    form_teknisi_label:'Teknisi', form_teknisi_placeholder:'Nama teknisi',
+    form_area_label:'Area', form_area_placeholder:'Area / line',
+    form_mesin_label:'Mesin', form_mesin_placeholder:'Pilih mesin',
+    form_status_label:'Status', form_status_placeholder:'Pilih status',
+    form_issue_label:'Issue', form_issue_placeholder:'Deskripsikan issue',
+    form_action_label:'Action', form_action_placeholder:'Tindakan yang dilakukan',
+    form_remark_label:'Remark', form_remark_placeholder:'Catatan tambahan',
+    page_parts_title:'Parts & Inventory', page_parts_subtitle:'Monitoring stok sparepart maintenance',
+    kpi_parts_total:'Total Item', kpi_parts_total_value:'Total Nilai Inventory',
+    kpi_parts_fast:'Fast Moving', kpi_parts_slow:'Slow Moving', kpi_parts_out:'Stok Habis',
+    page_meters_title:'Meters', page_meters_subtitle_default:'Running hour komponen per area (mingguan)',
+    page_meters_subtitle_latest:(w)=>`Running hour komponen per area — pembacaan terakhir: ${w}`,
+    kpi_meters_total_component:'Total Komponen', kpi_meters_total_area:'Total Area',
+    kpi_meters_up:'Naik Minggu Ini', kpi_meters_down:'Turun', kpi_meters_flat:'Stagnan',
+    page_po_title:'Purchase Orders',
+    page_po_subtitle:'Status pengadaan sparepart & material — status ditentukan otomatis dari kolom tanggal PR/PO/GR',
+    kpi_po_total:'Total PR/PO', kpi_po_received:'Sudah Diterima', kpi_po_ongoing:'Masih Berjalan',
+    kpi_po_avg_leadtime:'Rata-rata Lead Time', kpi_po_leadtime_unit:'hari', kpi_po_total_value:'Total Nilai',
+    dt_search_placeholder:'Cari...', dt_export:'Export',
+    dt_empty_title:'Tidak ada data', dt_empty_sub:'Coba ubah kata kunci pencarian atau filter.',
+    dt_showing:(a,b,total)=>`Menampilkan ${a}-${b} dari ${total} data`, dt_no_data:'Tidak ada data',
+    filter_all_machine:'Semua Mesin', filter_all_status:'Semua Status',
+    filter_all_category:'Semua Kategori', filter_all_area:'Semua Area',
+    modal_detail_downtime:'Detail Downtime', modal_detail_shift_log:'Detail Shift Log',
+    modal_detail_part:'Detail Part', modal_detail_running_hour:'Detail Running Hour',
+    modal_detail_po:'Detail Purchase Order',
+    toast_data_loaded:'Data berhasil dimuat.', toast_export_empty:'Tidak ada data untuk diekspor.',
+    toast_export_success:'Export CSV berhasil.', toast_activity_saved:'Shift log berhasil disimpan.',
+    toast_fullscreen_unsupported:'Fullscreen tidak didukung browser ini.',
+    settings_title:'Settings', settings_subtitle:'Preferensi aplikasi',
+    settings_language_title:'Bahasa', settings_language_sub:'Pilih bahasa tampilan aplikasi',
+    settings_lang_id_name:'Bahasa Indonesia', settings_lang_id_tag:'Default',
+    settings_lang_en_name:'English', settings_lang_en_tag:'International',
+    settings_lang_changed:'Bahasa berhasil diganti.'
+  },
+  en:{
+    app_loading:'Loading data…', powered_by:'Powered by Google Sheets',
+    login_username_label:'Username', login_username_placeholder:'Enter username',
+    login_password_label:'Password', login_password_placeholder:'Enter password',
+    login_remember:'Stay logged in on this device', login_submit:'Log In', login_submit_loading:'Processing…',
+    nav_section_main:'Main Menu', nav_section_account:'Account',
+    nav_overview:'Overview', nav_activities:'Activities', nav_parts:'Parts & Inventory',
+    nav_meters:'Meters', nav_po:'Purchase Orders', nav_settings:'Settings', nav_logout:'Logout',
+    search_placeholder:'Search data…',
+    tooltip_refresh:'Refresh data', tooltip_notif:'Notifications', tooltip_dark:'Dark mode',
+    tooltip_fullscreen:'Fullscreen', tooltip_print:'Print dashboard',
+    notif_title:'Notifications', notif_count:(n)=>`${n} new`, notif_empty:'No notifications',
+    btn_export_csv:'Export CSV', btn_refresh:'Refresh', btn_add_activity:'Add Activity',
+    btn_cancel:'Cancel', btn_save:'Save', btn_save_loading:'Sending…', btn_export:'Export',
+    page_overview_title:'Overview Dashboard',
+    page_overview_subtitle:'Downtime & machine performance summary — auto-refreshes every 60 seconds',
+    chart_mesin_title:'Downtime by Machine', chart_mesin_sub:'Total minutes',
+    chart_area_title:'Downtime by Category', chart_area_sub:'Total minutes',
+    chart_harian_title:'Downtime by Day', chart_harian_sub:'Last 14 days',
+    chart_component_title:'Top Problem Components', chart_component_sub:'Top 5',
+    chart_rootcause_title:'Top Root Cause', chart_rootcause_sub:'Top 5',
+    chart_sparepart_title:'Top Parts Used', chart_sparepart_sub:'Top 5',
+    chart_status_title:'Issue Status', chart_status_sub:'Open vs Closed',
+    chart_monthly_title:'Monthly Trend', chart_monthly_sub:'Number of incidents / month',
+    overview_latest_downtime:'Latest Downtime', overview_latest_downtime_sub:'Data from ORS sheet',
+    kpi_total_downtime:'Total Downtime', kpi_total_downtime_sub:'Total duration of all incidents',
+    kpi_total_breakdown:'Total Breakdown', kpi_total_breakdown_sub:'Number of downtime incidents',
+    kpi_availability:'Availability', kpi_availability_sub:'Estimated machine availability',
+    kpi_total_duration:'Total Duration', kpi_total_duration_sub:'Average duration / incident',
+    kpi_open_issue:'Open Issues', kpi_open_issue_sub:'Not yet resolved',
+    kpi_closed_issue:'Closed Issues', kpi_closed_issue_sub:'Already resolved',
+    kpi_sparepart_used:'Parts Used', kpi_sparepart_used_sub:'Incidents with parts used',
+    kpi_root_cause:'Root Causes Identified', kpi_root_cause_sub:'Unique causes identified',
+    kpi_corrective:'Corrective Actions', kpi_corrective_sub:'Corrective actions logged',
+    kpi_preventive:'Preventive Actions', kpi_preventive_sub:'Preventive actions logged',
+    unit_hour_short:'h', unit_minute_short:'m',
+    page_activities_title:'Activities', page_activities_subtitle:'Technician shift log history',
+    modal_add_activity_title:'Add Activity',
+    form_tanggal_label:'Date', form_shift_label:'Shift', form_shift_placeholder:'Select shift',
+    form_teknisi_label:'Technician', form_teknisi_placeholder:'Technician name',
+    form_area_label:'Area', form_area_placeholder:'Area / line',
+    form_mesin_label:'Machine', form_mesin_placeholder:'Select machine',
+    form_status_label:'Status', form_status_placeholder:'Select status',
+    form_issue_label:'Issue', form_issue_placeholder:'Describe the issue',
+    form_action_label:'Action', form_action_placeholder:'Action taken',
+    form_remark_label:'Remark', form_remark_placeholder:'Additional notes',
+    page_parts_title:'Parts & Inventory', page_parts_subtitle:'Maintenance parts stock monitoring',
+    kpi_parts_total:'Total Items', kpi_parts_total_value:'Total Inventory Value',
+    kpi_parts_fast:'Fast Moving', kpi_parts_slow:'Slow Moving', kpi_parts_out:'Out of Stock',
+    page_meters_title:'Meters', page_meters_subtitle_default:'Component running hours by area (weekly)',
+    page_meters_subtitle_latest:(w)=>`Component running hours by area — latest reading: ${w}`,
+    kpi_meters_total_component:'Total Components', kpi_meters_total_area:'Total Areas',
+    kpi_meters_up:'Up This Week', kpi_meters_down:'Down', kpi_meters_flat:'Flat',
+    page_po_title:'Purchase Orders',
+    page_po_subtitle:'Parts & material procurement status — status is derived automatically from PR/PO/GR date columns',
+    kpi_po_total:'Total PR/PO', kpi_po_received:'Received', kpi_po_ongoing:'In Progress',
+    kpi_po_avg_leadtime:'Average Lead Time', kpi_po_leadtime_unit:'days', kpi_po_total_value:'Total Value',
+    dt_search_placeholder:'Search...', dt_export:'Export',
+    dt_empty_title:'No data', dt_empty_sub:'Try changing your search keyword or filter.',
+    dt_showing:(a,b,total)=>`Showing ${a}-${b} of ${total} records`, dt_no_data:'No data',
+    filter_all_machine:'All Machines', filter_all_status:'All Statuses',
+    filter_all_category:'All Categories', filter_all_area:'All Areas',
+    modal_detail_downtime:'Downtime Detail', modal_detail_shift_log:'Shift Log Detail',
+    modal_detail_part:'Part Detail', modal_detail_running_hour:'Running Hour Detail',
+    modal_detail_po:'Purchase Order Detail',
+    toast_data_loaded:'Data loaded successfully.', toast_export_empty:'No data to export.',
+    toast_export_success:'CSV export successful.', toast_activity_saved:'Shift log saved successfully.',
+    toast_fullscreen_unsupported:'Fullscreen is not supported by this browser.',
+    settings_title:'Settings', settings_subtitle:'Application preferences',
+    settings_language_title:'Language', settings_language_sub:'Choose the application display language',
+    settings_lang_id_name:'Bahasa Indonesia', settings_lang_id_tag:'Default',
+    settings_lang_en_name:'English', settings_lang_en_tag:'International',
+    settings_lang_changed:'Language changed successfully.'
+  }
+};
+
+/** Ambil string terjemahan untuk `key` sesuai STATE.lang. Nilai boleh berupa fungsi
+ *  (untuk teks dengan variabel, mis. jumlah) — dipanggil dengan sisa argumen. */
+function t(key, ...args){
+  const dict = I18N[STATE.lang] || I18N.id;
+  const entry = dict[key] ?? I18N.id[key] ?? key;
+  return typeof entry === 'function' ? entry(...args) : entry;
+}
+
+/** Terapkan terjemahan ke semua elemen statis bertanda data-i18n(-placeholder/-title). */
+function applyTranslations(){
+  document.documentElement.lang = STATE.lang;
+  $$('[data-i18n]').forEach(el=>{ el.textContent = t(el.dataset.i18n); });
+  $$('[data-i18n-placeholder]').forEach(el=>{ el.placeholder = t(el.dataset.i18nPlaceholder); });
+  $$('[data-i18n-title]').forEach(el=>{ el.title = t(el.dataset.i18nTitle); });
+}
+
+/** Ganti bahasa aktif: simpan preferensi, terapkan ke elemen statis, lalu render ulang
+ *  halaman aktif supaya konten dinamis (KPI, tabel, chart) ikut berganti bahasa. */
+function setLanguage(lang){
+  STATE.lang = lang === 'en' ? 'en' : 'id';
+  safeStorage.set('ferrum_lang', STATE.lang);
+  applyTranslations();
+  renderSettingsPage();
+  if(STATE.loaded) renderCurrentPage();
+  showToast(t('settings_lang_changed'), 'success', 2000);
 }
 
 /* ---------------------------------------------------------------------- *
@@ -1032,14 +1203,21 @@ function toggleGlobalLoading(state){
  * ---------------------------------------------------------------------- */
 const SESSION_KEY = 'ferrum_session';
 
-// localStorage bisa diblokir (private browsing, sandboxed frame, dsb) — bungkus agar tidak crash.
-const safeStorage = {
-  get(key){ try{ return localStorage.getItem(key); }catch{ return null; } },
-  set(key,val){ try{ localStorage.setItem(key,val); }catch{} },
-  remove(key){ try{ localStorage.removeItem(key); }catch{} }
-};
+// localStorage/sessionStorage bisa diblokir (private browsing, sandboxed frame, dsb) — bahkan sekadar
+// membaca properti window.localStorage bisa melempar SecurityError. "kind" dirujuk lewat window[kind]
+// di dalam tiap method (bukan diteruskan sebagai argumen saat deklarasi) supaya try/catch benar-benar
+// membungkus titik akses yang bisa gagal itu.
+function createSafeStorage(kind){
+  return {
+    get(key){ try{ return window[kind].getItem(key); }catch{ return null; } },
+    set(key,val){ try{ window[kind].setItem(key,val); }catch{} },
+    remove(key){ try{ window[kind].removeItem(key); }catch{} }
+  };
+}
+const safeStorage = createSafeStorage('localStorage');   // "Tetap masuk" dicentang — bertahan lintas sesi browser
+const safeSession = createSafeStorage('sessionStorage');  // "Tetap masuk" tidak dicentang — hilang saat tab/browser ditutup
 
-async function login(username, password){
+async function login(username, password, remember=true){
   const users = await loadUsers();
   const match = users.find(u=>{
     const uName = normKey(getField(u,'Username'));
@@ -1053,19 +1231,22 @@ async function login(username, password){
     username:getField(match,'Username'), nama:getField(match,'Nama')||getField(match,'Username'),
     role:getField(match,'Role')||'User', area:getField(match,'Area')||'-', ts:Date.now()
   };
-  safeStorage.set(SESSION_KEY, JSON.stringify(session));
+  // Selalu bersihkan penyimpanan lain agar tidak ada sesi lama yang tertinggal di sana.
+  if(remember){ safeStorage.set(SESSION_KEY, JSON.stringify(session)); safeSession.remove(SESSION_KEY); }
+  else{ safeSession.set(SESSION_KEY, JSON.stringify(session)); safeStorage.remove(SESSION_KEY); }
   STATE.user = session;
   return session;
 }
 
 function logout(){
   safeStorage.remove(SESSION_KEY);
+  safeSession.remove(SESSION_KEY);
   location.reload();
 }
 
 function restoreSession(){
   try{
-    const raw = safeStorage.get(SESSION_KEY);
+    const raw = safeStorage.get(SESSION_KEY) || safeSession.get(SESSION_KEY);
     if(!raw) return null;
     const session = JSON.parse(raw);
     STATE.user = session;
@@ -1494,7 +1675,7 @@ function renderSparepartTable(){
           return `<span class="badge ${s.cls}">${s.label}</span>`;
         } }
     ],
-    onRowClick:(row)=> openDetailModal('Detail Sparepart', row, ['No SAP','Nama Material','Jenis Barang','Mesin','Area','Stock','Satuan','Harga @','Total Value','Last Lead Time Order on Days','Distribution 6M','Racking','Sloc','Mapping'])
+    onRowClick:(row)=> openDetailModal('Detail Part', row, ['No SAP','Nama Material','Jenis Barang','Mesin','Area','Stock','Satuan','Harga @','Total Value','Last Lead Time Order on Days','Distribution 6M','Racking','Sloc','Mapping'])
   });
 }
 
@@ -1619,6 +1800,13 @@ function openDetailModal(title, row, fields){
 }
 function closeDetailModal(){ $('#modalBackdrop').classList.remove('show'); }
 
+function openActivityModal(){
+  populateMesinDropdown();
+  if(!$('#actTeknisi').value) $('#actTeknisi').value = STATE.user?.nama || '';
+  $('#activityModalBackdrop').classList.add('show');
+}
+function closeActivityModal(){ $('#activityModalBackdrop').classList.remove('show'); }
+
 /* ---------------------------------------------------------------------- *
  * 16. NOTIFICATIONS (derived, no separate sheet)
  * ---------------------------------------------------------------------- */
@@ -1656,7 +1844,7 @@ function renderCurrentPage(){
     case 'overview': renderOverview(); break;
     case 'activities':
       populateMesinDropdown();
-      if($('#tab-history').classList.contains('active')) renderActivitiesHistory();
+      renderActivitiesHistory();
       break;
     case 'sparepart': renderSparepartTable(); break;
     case 'meter': renderMeterPage(); break;
@@ -1668,8 +1856,6 @@ function navigateTo(pageId){
   STATE.currentPage = pageId;
   $$('.page').forEach(p=> p.classList.toggle('active', p.id===`page-${pageId}`));
   $$('.nav-item[data-page]').forEach(n=> n.classList.toggle('active', n.dataset.page===pageId));
-  const meta = CONFIG.NAV_ITEMS.find(n=>n.id===pageId);
-  if(meta){ $('#topbarTitle').textContent = meta.title; $('#topbarSubtitle').textContent = meta.subtitle; }
   $('#globalSearch').value = '';
   closeAllDropdowns();
   if(window.innerWidth<=1024) closeDrawer();
@@ -1763,16 +1949,11 @@ function wireEvents(){
     if(key && STATE.tables[key]) STATE.tables[key].setSearch(val);
   },250));
 
-  // Tabs (Activities)
-  $$('.tab-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      $$('.tab-btn').forEach(b=>b.classList.remove('active'));
-      $$('.tab-content').forEach(c=>c.classList.remove('active'));
-      btn.classList.add('active');
-      $(`#tab-${btn.dataset.tab}`).classList.add('active');
-      if(btn.dataset.tab==='history') renderActivitiesHistory();
-    });
-  });
+  // Activity input modal (Activities page)
+  $('#btnOpenActivityModal').addEventListener('click', openActivityModal);
+  $('#activityModalCloseBtn').addEventListener('click', closeActivityModal);
+  $('#btnCancelActivity').addEventListener('click', closeActivityModal);
+  $('#activityModalBackdrop').addEventListener('click', (e)=>{ if(e.target.id==='activityModalBackdrop') closeActivityModal(); });
 
   // Modal
   $('#modalCloseBtn').addEventListener('click', closeDetailModal);
@@ -1800,7 +1981,7 @@ function wireEvents(){
     errBox.classList.remove('show');
     btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner spin"></i> <span>Memproses…</span>';
     try{
-      await login($('#loginUsername').value.trim(), $('#loginPassword').value);
+      await login($('#loginUsername').value.trim(), $('#loginPassword').value, $('#loginRemember').checked);
       await onLoginSuccess();
     }catch(err){
       errBox.querySelector('span').textContent = err.message;
@@ -1826,6 +2007,7 @@ function wireEvents(){
       STATE.data.activities.unshift({ ...payload, Tanggal:new Date(payload.Tanggal) });
       $('#activityForm').reset();
       $('#actTeknisi').value = STATE.user?.nama || '';
+      closeActivityModal();
       if(STATE.tables.activities) STATE.tables.activities.refresh();
     }catch(err){
       showToast(err.message, 'error');
@@ -1836,7 +2018,7 @@ function wireEvents(){
 
   // Keyboard: ESC closes modal/drawer/dropdown
   document.addEventListener('keydown', (e)=>{
-    if(e.key==='Escape'){ closeDetailModal(); closeDrawer(); closeAllDropdowns(); }
+    if(e.key==='Escape'){ closeDetailModal(); closeActivityModal(); closeDrawer(); closeAllDropdowns(); }
   });
 
   window.addEventListener('resize', ()=>{ if(window.innerWidth>1024) closeDrawer(); });
@@ -1855,11 +2037,14 @@ function applyStoredPreferences(){
   if(theme==='dark'){ STATE.theme='dark'; document.documentElement.setAttribute('data-theme','dark'); $('#btnDark i').className='fa-solid fa-sun'; }
   const collapsed = safeStorage.get('ferrum_sidebar_collapsed');
   if(collapsed==='1'){ STATE.sidebarCollapsed=true; $('#sidebar').classList.add('collapsed'); }
+  const lang = safeStorage.get('ferrum_lang');
+  STATE.lang = lang === 'en' ? 'en' : 'id'; // default Bahasa Indonesia
 }
 
 async function init(){
   $('#loginYear').textContent = new Date().getFullYear();
   applyStoredPreferences();
+  applyTranslations();
   wireEvents();
   updateClock();
   setInterval(updateClock, 1000);
