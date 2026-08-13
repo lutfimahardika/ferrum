@@ -423,6 +423,24 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
 .detail-row b{color:var(--text-muted);font-weight:600;flex-shrink:0;}
 .detail-row span{text-align:right;}
 
+/* ---- Machine Meter cards ---- */
+.grid-meter{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
+.meter-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;cursor:pointer;
+  transition:border-color var(--transition);
+}
+.meter-card:hover{border-color:var(--primary);}
+.meter-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px;}
+.meter-card-head h4{font-size:13.5px;line-height:1.3;}
+.meter-card-area{font-size:11px;color:var(--text-dim);display:block;margin-top:2px;}
+.meter-card-delta{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;flex-shrink:0;white-space:nowrap;}
+.meter-card-delta.up{background:var(--success-bg);color:var(--success);}
+.meter-card-delta.down{background:var(--danger-bg);color:var(--danger);}
+.meter-card-delta.flat{background:var(--bg);color:var(--text-dim);}
+.meter-card-value{font-family:var(--font-display);font-size:26px;font-weight:800;margin-bottom:4px;}
+.meter-card-value small{font-family:var(--font);font-size:12px;font-weight:500;color:var(--text-dim);margin-left:4px;}
+.meter-card-prev{font-size:11.5px;color:var(--text-dim);}
+
 /* ---- Settings / Language ---- */
 .settings-panel{max-width:560px;}
 .lang-options{display:flex;flex-direction:column;gap:10px;}
@@ -625,7 +643,12 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
           <div><h1 data-i18n="page_meters_title">Meters</h1><p id="meterSubtitle" data-i18n="page_meters_subtitle_default">Running hour komponen per area (mingguan)</p></div>
           <div class="page-head-actions"><button class="btn btn-primary btn-sm" id="btnRefreshMeter"><i class="fa-solid fa-rotate"></i> <span data-i18n="btn_refresh">Refresh</span></button></div>
         </div>
-        <div class="panel"><div id="tbl-meter"></div></div>
+        <div class="dt-toolbar">
+          <div class="dt-search"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="meterSearchInput" placeholder="Cari..." data-i18n-placeholder="dt_search_placeholder" /></div>
+          <div class="dt-filters"><select id="meterAreaFilter"></select></div>
+          <div class="dt-toolbar-actions"><button class="btn btn-ghost btn-sm" id="btnExportMeter"><i class="fa-solid fa-file-csv"></i> <span data-i18n="dt_export">Export</span></button></div>
+        </div>
+        <div class="grid-meter" id="meterGrid"></div>
       </section>
 
       <!-- ============================= PURCHASE ORDER ============================= -->
@@ -884,6 +907,7 @@ const I18N = {
     kpi_parts_fast:'Fast Moving', kpi_parts_slow:'Slow Moving', kpi_parts_out:'Stok Habis',
     page_meters_title:'Meters', page_meters_subtitle_default:'Running hour komponen per area (mingguan)',
     page_meters_subtitle_latest:(w)=>`Running hour komponen per area — pembacaan terakhir: ${w}`,
+    meter_prev_week:'Minggu lalu',
     page_po_title:'Purchase Orders',
     page_po_subtitle:'Status pengadaan sparepart & material — status ditentukan otomatis dari kolom tanggal PR/PO/GR',
     kpi_po_total:'Total PR/PO', kpi_po_received:'Sudah Diterima', kpi_po_ongoing:'Masih Berjalan',
@@ -959,6 +983,7 @@ const I18N = {
     kpi_parts_fast:'Fast Moving', kpi_parts_slow:'Slow Moving', kpi_parts_out:'Out of Stock',
     page_meters_title:'Meters', page_meters_subtitle_default:'Component running hours by area (weekly)',
     page_meters_subtitle_latest:(w)=>`Component running hours by area — latest reading: ${w}`,
+    meter_prev_week:'Last week',
     page_po_title:'Purchase Orders',
     page_po_subtitle:'Parts & material procurement status — status is derived automatically from PR/PO/GR date columns',
     kpi_po_total:'Total PR/PO', kpi_po_received:'Received', kpi_po_ongoing:'In Progress',
@@ -1740,33 +1765,62 @@ function updateMeterSubtitle(){
   }
 }
 
+/** Terapkan pencarian + filter Area yang sedang aktif di toolbar ke dataset meter. */
+function getFilteredMeterRows(){
+  const search = ($('#meterSearchInput')?.value || '').trim().toLowerCase();
+  const area = $('#meterAreaFilter')?.value || '';
+  let rows = STATE.data.meter;
+  if(area) rows = rows.filter(r=> String(getField(r,'Area')||'') === area);
+  if(search){
+    rows = rows.filter(r=> String(getField(r,'Nama Mesin')||'').toLowerCase().includes(search) || String(getField(r,'Area')||'').toLowerCase().includes(search));
+  }
+  return rows;
+}
+
+function openMeterDetail(row){
+  const weekKeys = Object.keys(row).filter(k=>/^W\d+$/i.test(k)).sort((a,b)=>parseInt(a.slice(1))-parseInt(b.slice(1)));
+  openDetailModal(t('modal_detail_running_hour'), row, ['Area','Nama Mesin','Unit', ...weekKeys]);
+}
+
+/** Render ulang isi grid kartu saja (dipanggil saat search/filter berubah), tanpa
+ *  membangun ulang toolbar — dipisah dari renderMeterPage() supaya event listener
+ *  pada input pencarian/filter hanya perlu dipasang sekali (lihat wireEvents()). */
+function renderMeterCards(){
+  const grid = $('#meterGrid');
+  const rows = getFilteredMeterRows();
+
+  if(!rows.length){
+    grid.innerHTML = `<div class="state-block" style="grid-column:1/-1;"><i class="fa-solid fa-inbox"></i><b>${t('dt_empty_title')}</b><span>${t('dt_empty_sub')}</span></div>`;
+    return;
+  }
+
+  grid.innerHTML = rows.map((r,idx)=>{
+    const delta = r._delta || 0;
+    const cls = delta>0 ? 'up' : delta<0 ? 'down' : 'flat';
+    const icon = delta>0 ? 'fa-arrow-up' : delta<0 ? 'fa-arrow-down' : 'fa-minus';
+    return `<div class="meter-card" data-idx="${idx}">
+      <div class="meter-card-head">
+        <div><h4>${escapeHtml(getField(r,'Nama Mesin'))}</h4><span class="meter-card-area">${escapeHtml(getField(r,'Area')||'-')}</span></div>
+        <span class="meter-card-delta ${cls}"><i class="fa-solid ${icon}"></i> ${Math.abs(delta).toLocaleString('id-ID')}</span>
+      </div>
+      <div class="meter-card-value">${formatCell(r._latestValue)}<small>${escapeHtml(getField(r,'Unit')||'')}</small></div>
+      <div class="meter-card-prev">${t('meter_prev_week')}: ${formatCell(r._prevValue)}</div>
+    </div>`;
+  }).join('');
+
+  grid.querySelectorAll('.meter-card').forEach(el=>{
+    el.addEventListener('click', ()=> openMeterDetail(rows[Number(el.dataset.idx)]));
+  });
+}
+
 function renderMeterPage(){
   updateMeterSubtitle();
-  if(STATE.tables.meter){ STATE.tables.meter.refresh(); return; }
-  const latestLabel = STATE.data.meter[0]?._latestWeek || 'Terakhir';
-  const prevLabel = STATE.data.meter[0]?._prevWeek || 'Sebelumnya';
-  STATE.tables.meter = createDataTable({
-    id:'tbl-meter', pageSize:10, exportName:'running_hour',
-    getData:()=> STATE.data.meter,
-    filters:[ { key:'Area', label:t('filter_all_area'), options:uniqueValues(STATE.data.meter,'Area') } ],
-    columns:[
-      { key:'Area', label:'Area' },
-      { key:'Nama Mesin', label:'Komponen' },
-      { key:'Unit', label:'Satuan' },
-      { key:'_prevValue', label:prevLabel, render:r=> formatCell(r._prevValue) },
-      { key:'_latestValue', label:latestLabel, render:r=> formatCell(r._latestValue) },
-      { key:'_delta', label:'Perubahan', render:r=>{
-          const d = r._delta||0;
-          const cls = d>0 ? 'text-success' : d<0 ? 'text-danger' : '';
-          const icon = d>0 ? 'fa-arrow-up' : d<0 ? 'fa-arrow-down' : 'fa-minus';
-          return `<span class="${cls}"><i class="fa-solid ${icon}"></i> ${Math.abs(d).toLocaleString('id-ID')}</span>`;
-        } }
-    ],
-    onRowClick:(row)=>{
-      const weekKeys = Object.keys(row).filter(k=>/^W\d+$/i.test(k)).sort((a,b)=>parseInt(a.slice(1))-parseInt(b.slice(1)));
-      openDetailModal(t('modal_detail_running_hour'), row, ['Area','Nama Mesin','Unit', ...weekKeys]);
-    }
-  });
+  const areaSelect = $('#meterAreaFilter');
+  const prevSelected = areaSelect.value;
+  const options = uniqueValues(STATE.data.meter,'Area');
+  areaSelect.innerHTML = `<option value="">${t('filter_all_area')}</option>` + options.map(a=>`<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join('');
+  areaSelect.value = options.includes(prevSelected) ? prevSelected : '';
+  renderMeterCards();
 }
 
 /* ---------------------------------------------------------------------- *
@@ -1978,6 +2032,17 @@ function wireEvents(){
       {key:'Tanggal',label:'Tanggal'},{key:'Mesin',label:'Mesin'},{key:'Downtime',label:'Downtime'},
       {key:'Root Cause',label:'Root Cause'},{key:'Status',label:'Status'},{key:'Duration',label:'Duration'}
     ], STATE.data.ors);
+  });
+
+  // Machine Meter card view: search & filter di toolbar hanya perlu di-render ulang
+  // (renderMeterCards), bukan seluruh halaman (renderMeterPage yang membangun ulang toolbar).
+  $('#meterSearchInput').addEventListener('input', debounce(renderMeterCards, 250));
+  $('#meterAreaFilter').addEventListener('change', renderMeterCards);
+  $('#btnExportMeter').addEventListener('click', ()=>{
+    exportCSV('running_hour', [
+      { key:'Area', label:'Area' }, { key:'Nama Mesin', label:'Komponen' }, { key:'Unit', label:'Unit' },
+      { key:'_prevValue', label:'Prev' }, { key:'_latestValue', label:'Latest' }, { key:'_delta', label:'Delta' }
+    ], getFilteredMeterRows());
   });
 
   $('#btnNotif').addEventListener('click', (e)=>{ e.stopPropagation(); $('#notifPanel').classList.toggle('show'); });
