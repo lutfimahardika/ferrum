@@ -423,6 +423,22 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
 .detail-row b{color:var(--text-muted);font-weight:600;flex-shrink:0;}
 .detail-row span{text-align:right;}
 
+/* ---- Settings / Language ---- */
+.settings-panel{max-width:560px;}
+.lang-options{display:flex;flex-direction:column;gap:10px;}
+.lang-option{
+  display:flex;align-items:center;gap:14px;padding:14px 16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--bg);width:100%;text-align:left;transition:border-color var(--transition),background var(--transition);
+}
+.lang-option:hover{border-color:var(--primary);}
+.lang-option.active{border-color:var(--primary);background:rgba(0,0,255,.05);}
+.lang-flag{font-size:24px;line-height:1;flex-shrink:0;}
+.lang-info{flex:1;display:flex;flex-direction:column;}
+.lang-info b{font-size:13.5px;}
+.lang-info span{font-size:11.5px;color:var(--text-dim);}
+.lang-check{color:var(--primary);font-size:16px;opacity:0;transition:opacity var(--transition);}
+.lang-option.active .lang-check{opacity:1;}
+
 /* ---- Misc ---- */
 .stock-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;}
 ::selection{background:rgba(0,0,255,.2);}
@@ -466,27 +482,27 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
       <h1>Ferrum</h1>
     </div>
     <form class="login-form" id="loginForm" autocomplete="off">
-      <label for="loginUsername">Username</label>
+      <label for="loginUsername" data-i18n="login_username_label">Username</label>
       <div class="input-group">
         <i class="fa-solid fa-user"></i>
-        <input type="text" id="loginUsername" placeholder="Masukkan username" required />
+        <input type="text" id="loginUsername" placeholder="Masukkan username" data-i18n-placeholder="login_username_placeholder" required />
       </div>
-      <label for="loginPassword">Password</label>
+      <label for="loginPassword" data-i18n="login_password_label">Password</label>
       <div class="input-group">
         <i class="fa-solid fa-lock"></i>
-        <input type="password" id="loginPassword" placeholder="Masukkan password" required />
+        <input type="password" id="loginPassword" placeholder="Masukkan password" data-i18n-placeholder="login_password_placeholder" required />
         <i class="fa-solid fa-eye toggle-pass" id="togglePassBtn"></i>
       </div>
       <label class="login-remember" for="loginRemember">
         <input type="checkbox" id="loginRemember" checked />
-        <span>Tetap masuk di perangkat ini</span>
+        <span data-i18n="login_remember">Tetap masuk di perangkat ini</span>
       </label>
       <div class="login-error" id="loginError"><i class="fa-solid fa-triangle-exclamation"></i><span></span></div>
       <button type="submit" class="btn-login" id="loginSubmitBtn">
-        <i class="fa-solid fa-right-to-bracket"></i> <span>Masuk</span>
+        <i class="fa-solid fa-right-to-bracket"></i> <span data-i18n="login_submit">Masuk</span>
       </button>
     </form>
-    <div class="login-foot">Ferrum &copy; <span id="loginYear"></span> — Powered by Google Sheets</div>
+    <div class="login-foot">Ferrum &copy; <span id="loginYear"></span> — <span data-i18n="powered_by">Powered by Google Sheets</span></div>
   </div>
 </div>
 
@@ -504,14 +520,15 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
       <div class="sidebar-logo-text"><b>Ferrum</b></div>
     </div>
     <nav class="sidebar-nav" id="sidebarNav">
-      <span class="nav-section-label">Menu Utama</span>
-      <button class="nav-item active" data-page="overview"><i class="fa-solid fa-gauge-high"></i><span class="nav-label">Overview</span></button>
-      <button class="nav-item" data-page="activities"><i class="fa-solid fa-clipboard-list"></i><span class="nav-label">Activities</span></button>
-      <button class="nav-item" data-page="sparepart"><i class="fa-solid fa-boxes-stacked"></i><span class="nav-label">Parts &amp; Inventory</span></button>
-      <button class="nav-item" data-page="meter"><i class="fa-solid fa-gauge"></i><span class="nav-label">Meters</span></button>
-      <button class="nav-item" data-page="po"><i class="fa-solid fa-file-invoice-dollar"></i><span class="nav-label">Purchase Orders</span></button>
-      <span class="nav-section-label">Akun</span>
-      <button class="nav-item" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i><span class="nav-label">Logout</span></button>
+      <span class="nav-section-label" data-i18n="nav_section_main">Menu Utama</span>
+      <button class="nav-item active" data-page="overview"><i class="fa-solid fa-gauge-high"></i><span class="nav-label" data-i18n="nav_overview">Overview</span></button>
+      <button class="nav-item" data-page="activities"><i class="fa-solid fa-clipboard-list"></i><span class="nav-label" data-i18n="nav_activities">Activities</span></button>
+      <button class="nav-item" data-page="sparepart"><i class="fa-solid fa-boxes-stacked"></i><span class="nav-label" data-i18n="nav_parts">Parts &amp; Inventory</span></button>
+      <button class="nav-item" data-page="meter"><i class="fa-solid fa-gauge"></i><span class="nav-label" data-i18n="nav_meters">Meters</span></button>
+      <button class="nav-item" data-page="po"><i class="fa-solid fa-file-invoice-dollar"></i><span class="nav-label" data-i18n="nav_po">Purchase Orders</span></button>
+      <span class="nav-section-label" data-i18n="nav_section_account">Akun</span>
+      <button class="nav-item" data-page="settings"><i class="fa-solid fa-gear"></i><span class="nav-label" data-i18n="nav_settings">Settings</span></button>
+      <button class="nav-item" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i><span class="nav-label" data-i18n="nav_logout">Logout</span></button>
     </nav>
     <div class="sidebar-foot">
       <div class="sidebar-user">
@@ -528,7 +545,7 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
       <button class="topbar-hamburger" id="btnHamburger"><i class="fa-solid fa-bars"></i></button>
       <div class="topbar-search">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="globalSearch" placeholder="Cari data…" />
+        <input type="text" id="globalSearch" placeholder="Cari data…" data-i18n-placeholder="search_placeholder" />
       </div>
       <div class="topbar-clock">
         <b id="clockTime">--:--:--</b>
@@ -536,15 +553,15 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
       </div>
       <div class="topbar-divider"></div>
       <div class="topbar-actions">
-        <button class="icon-btn" id="btnRefresh" title="Refresh data"><i class="fa-solid fa-rotate"></i></button>
-        <button class="icon-btn" id="btnNotif" title="Notifikasi"><i class="fa-regular fa-bell"></i><span class="icon-dot hidden" id="notifDot"></span></button>
-        <button class="icon-btn" id="btnDark" title="Dark mode"><i class="fa-solid fa-moon"></i></button>
-        <button class="icon-btn" id="btnFullscreen" title="Fullscreen"><i class="fa-solid fa-expand"></i></button>
-        <button class="icon-btn" id="btnPrint" title="Print dashboard"><i class="fa-solid fa-print"></i></button>
+        <button class="icon-btn" id="btnRefresh" title="Refresh data" data-i18n-title="tooltip_refresh"><i class="fa-solid fa-rotate"></i></button>
+        <button class="icon-btn" id="btnNotif" title="Notifikasi" data-i18n-title="tooltip_notif"><i class="fa-regular fa-bell"></i><span class="icon-dot hidden" id="notifDot"></span></button>
+        <button class="icon-btn" id="btnDark" title="Dark mode" data-i18n-title="tooltip_dark"><i class="fa-solid fa-moon"></i></button>
+        <button class="icon-btn" id="btnFullscreen" title="Fullscreen" data-i18n-title="tooltip_fullscreen"><i class="fa-solid fa-expand"></i></button>
+        <button class="icon-btn" id="btnPrint" title="Print dashboard" data-i18n-title="tooltip_print"><i class="fa-solid fa-print"></i></button>
       </div>
       <!-- notification dropdown -->
       <div class="dropdown-panel" id="notifPanel">
-        <div class="dropdown-head">Notifikasi <span id="notifCount">0 baru</span></div>
+        <div class="dropdown-head"><span data-i18n="notif_title">Notifikasi</span> <span id="notifCount">0 baru</span></div>
         <div id="notifList"></div>
       </div>
     </header>
@@ -555,28 +572,28 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
       <!-- ============================= OVERVIEW ============================= -->
       <section class="page active" id="page-overview">
         <div class="page-head">
-          <div><h1>Overview Dashboard</h1><p>Ringkasan downtime &amp; performa mesin — auto-refresh setiap 60 detik</p></div>
+          <div><h1 data-i18n="page_overview_title">Overview Dashboard</h1><p data-i18n="page_overview_subtitle">Ringkasan downtime &amp; performa mesin — auto-refresh setiap 60 detik</p></div>
           <div class="page-head-actions">
-            <button class="btn btn-outline btn-sm" id="btnExportOverview"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
-            <button class="btn btn-primary btn-sm" id="btnRefreshOverview"><i class="fa-solid fa-rotate"></i> Refresh</button>
+            <button class="btn btn-outline btn-sm" id="btnExportOverview"><i class="fa-solid fa-file-csv"></i> <span data-i18n="btn_export_csv">Export CSV</span></button>
+            <button class="btn btn-primary btn-sm" id="btnRefreshOverview"><i class="fa-solid fa-rotate"></i> <span data-i18n="btn_refresh">Refresh</span></button>
           </div>
         </div>
 
         <div class="grid-kpi" id="kpiGrid"></div>
 
         <div class="grid-charts">
-          <div class="panel"><div class="panel-head"><h3>Downtime per Mesin</h3><span>Total menit</span></div><div class="chart-wrap"><canvas id="chartMesin"></canvas></div></div>
-          <div class="panel"><div class="panel-head"><h3>Downtime per Kategori</h3><span>Total menit</span></div><div class="chart-wrap"><canvas id="chartArea"></canvas></div></div>
-          <div class="panel"><div class="panel-head"><h3>Downtime per Hari</h3><span>14 hari terakhir</span></div><div class="chart-wrap"><canvas id="chartHarian"></canvas></div></div>
-          <div class="panel"><div class="panel-head"><h3>Top Komponen Bermasalah</h3><span>5 teratas</span></div><div class="chart-wrap"><canvas id="chartComponent"></canvas></div></div>
-          <div class="panel"><div class="panel-head"><h3>Top Root Cause</h3><span>5 teratas</span></div><div class="chart-wrap"><canvas id="chartRootCause"></canvas></div></div>
-          <div class="panel"><div class="panel-head"><h3>Top Sparepart Terpakai</h3><span>5 teratas</span></div><div class="chart-wrap"><canvas id="chartTopSparepart"></canvas></div></div>
-          <div class="panel"><div class="panel-head"><h3>Status Issue</h3><span>Open vs Closed</span></div><div class="chart-wrap sm"><canvas id="chartStatusIssue"></canvas></div></div>
-          <div class="panel"><div class="panel-head"><h3>Monthly Trend</h3><span>Jumlah kejadian / bulan</span></div><div class="chart-wrap"><canvas id="chartMonthly"></canvas></div></div>
+          <div class="panel"><div class="panel-head"><h3 data-i18n="chart_mesin_title">Downtime per Mesin</h3><span data-i18n="chart_mesin_sub">Total menit</span></div><div class="chart-wrap"><canvas id="chartMesin"></canvas></div></div>
+          <div class="panel"><div class="panel-head"><h3 data-i18n="chart_area_title">Downtime per Kategori</h3><span data-i18n="chart_area_sub">Total menit</span></div><div class="chart-wrap"><canvas id="chartArea"></canvas></div></div>
+          <div class="panel"><div class="panel-head"><h3 data-i18n="chart_harian_title">Downtime per Hari</h3><span data-i18n="chart_harian_sub">14 hari terakhir</span></div><div class="chart-wrap"><canvas id="chartHarian"></canvas></div></div>
+          <div class="panel"><div class="panel-head"><h3 data-i18n="chart_component_title">Top Komponen Bermasalah</h3><span data-i18n="chart_component_sub">5 teratas</span></div><div class="chart-wrap"><canvas id="chartComponent"></canvas></div></div>
+          <div class="panel"><div class="panel-head"><h3 data-i18n="chart_rootcause_title">Top Root Cause</h3><span data-i18n="chart_rootcause_sub">5 teratas</span></div><div class="chart-wrap"><canvas id="chartRootCause"></canvas></div></div>
+          <div class="panel"><div class="panel-head"><h3 data-i18n="chart_sparepart_title">Top Sparepart Terpakai</h3><span data-i18n="chart_sparepart_sub">5 teratas</span></div><div class="chart-wrap"><canvas id="chartTopSparepart"></canvas></div></div>
+          <div class="panel"><div class="panel-head"><h3 data-i18n="chart_status_title">Status Issue</h3><span data-i18n="chart_status_sub">Open vs Closed</span></div><div class="chart-wrap sm"><canvas id="chartStatusIssue"></canvas></div></div>
+          <div class="panel"><div class="panel-head"><h3 data-i18n="chart_monthly_title">Monthly Trend</h3><span data-i18n="chart_monthly_sub">Jumlah kejadian / bulan</span></div><div class="chart-wrap"><canvas id="chartMonthly"></canvas></div></div>
         </div>
 
         <div class="panel">
-          <div class="panel-head"><h3>Latest Downtime</h3><span>Data dari sheet ORS</span></div>
+          <div class="panel-head"><h3 data-i18n="overview_latest_downtime">Latest Downtime</h3><span data-i18n="overview_latest_downtime_sub">Data dari sheet ORS</span></div>
           <div id="tbl-ors"></div>
         </div>
       </section>
@@ -584,9 +601,9 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
       <!-- ============================= ACTIVITIES ============================= -->
       <section class="page" id="page-activities">
         <div class="page-head">
-          <div><h1>Activities</h1><p>Riwayat shift log teknisi</p></div>
+          <div><h1 data-i18n="page_activities_title">Activities</h1><p data-i18n="page_activities_subtitle">Riwayat shift log teknisi</p></div>
           <div class="page-head-actions">
-            <button class="btn btn-primary btn-sm" id="btnOpenActivityModal"><i class="fa-solid fa-plus"></i> Tambahkan Aktivitas</button>
+            <button class="btn btn-primary btn-sm" id="btnOpenActivityModal"><i class="fa-solid fa-plus"></i> <span data-i18n="btn_add_activity">Tambahkan Aktivitas</span></button>
           </div>
         </div>
         <div class="panel"><div id="tbl-activities"></div></div>
@@ -595,8 +612,8 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
       <!-- ============================= SPAREPART ============================= -->
       <section class="page" id="page-sparepart">
         <div class="page-head">
-          <div><h1>Parts &amp; Inventory</h1><p>Monitoring stok sparepart maintenance</p></div>
-          <div class="page-head-actions"><button class="btn btn-primary btn-sm" id="btnRefreshSparepart"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
+          <div><h1 data-i18n="page_parts_title">Parts &amp; Inventory</h1><p data-i18n="page_parts_subtitle">Monitoring stok sparepart maintenance</p></div>
+          <div class="page-head-actions"><button class="btn btn-primary btn-sm" id="btnRefreshSparepart"><i class="fa-solid fa-rotate"></i> <span data-i18n="btn_refresh">Refresh</span></button></div>
         </div>
         <div class="grid-kpi" id="spKpiGrid" style="margin-bottom:18px;"></div>
         <div class="panel"><div id="tbl-sparepart"></div></div>
@@ -605,8 +622,8 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
       <!-- ============================= METER ============================= -->
       <section class="page" id="page-meter">
         <div class="page-head">
-          <div><h1>Meters</h1><p id="meterSubtitle">Running hour komponen per area (mingguan)</p></div>
-          <div class="page-head-actions"><button class="btn btn-primary btn-sm" id="btnRefreshMeter"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
+          <div><h1 data-i18n="page_meters_title">Meters</h1><p id="meterSubtitle" data-i18n="page_meters_subtitle_default">Running hour komponen per area (mingguan)</p></div>
+          <div class="page-head-actions"><button class="btn btn-primary btn-sm" id="btnRefreshMeter"><i class="fa-solid fa-rotate"></i> <span data-i18n="btn_refresh">Refresh</span></button></div>
         </div>
         <div class="grid-kpi" id="meterKpiGrid" style="margin-bottom:18px;"></div>
         <div class="panel"><div id="tbl-meter"></div></div>
@@ -615,11 +632,33 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
       <!-- ============================= PURCHASE ORDER ============================= -->
       <section class="page" id="page-po">
         <div class="page-head">
-          <div><h1>Purchase Orders</h1><p>Status pengadaan sparepart &amp; material — status ditentukan otomatis dari kolom tanggal PR/PO/GR</p></div>
-          <div class="page-head-actions"><button class="btn btn-primary btn-sm" id="btnRefreshPO"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
+          <div><h1 data-i18n="page_po_title">Purchase Orders</h1><p data-i18n="page_po_subtitle">Status pengadaan sparepart &amp; material — status ditentukan otomatis dari kolom tanggal PR/PO/GR</p></div>
+          <div class="page-head-actions"><button class="btn btn-primary btn-sm" id="btnRefreshPO"><i class="fa-solid fa-rotate"></i> <span data-i18n="btn_refresh">Refresh</span></button></div>
         </div>
         <div class="grid-kpi" id="poKpiGrid" style="margin-bottom:18px;"></div>
         <div class="panel"><div id="tbl-po"></div></div>
+      </section>
+
+      <!-- ============================= SETTINGS ============================= -->
+      <section class="page" id="page-settings">
+        <div class="page-head">
+          <div><h1 data-i18n="settings_title">Settings</h1><p data-i18n="settings_subtitle">Preferensi aplikasi</p></div>
+        </div>
+        <div class="panel settings-panel">
+          <div class="panel-head"><h3 data-i18n="settings_language_title">Bahasa</h3><span data-i18n="settings_language_sub">Pilih bahasa tampilan aplikasi</span></div>
+          <div class="lang-options" id="langOptions">
+            <button class="lang-option" data-lang="id">
+              <span class="lang-flag">🇮🇩</span>
+              <span class="lang-info"><b data-i18n="settings_lang_id_name">Bahasa Indonesia</b><span data-i18n="settings_lang_id_tag">Default</span></span>
+              <i class="fa-solid fa-circle-check lang-check"></i>
+            </button>
+            <button class="lang-option" data-lang="en">
+              <span class="lang-flag">🇬🇧</span>
+              <span class="lang-info"><b data-i18n="settings_lang_en_name">English</b><span data-i18n="settings_lang_en_tag">International</span></span>
+              <i class="fa-solid fa-circle-check lang-check"></i>
+            </button>
+          </div>
+        </div>
       </section>
 
     </div>
@@ -637,27 +676,27 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
 <!-- Activity Input Modal -->
 <div class="modal-backdrop" id="activityModalBackdrop">
   <div class="modal-box modal-box--wide">
-    <div class="modal-head"><h3>Tambahkan Aktivitas</h3><button class="modal-close" id="activityModalCloseBtn"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="modal-head"><h3 data-i18n="modal_add_activity_title">Tambahkan Aktivitas</h3><button class="modal-close" id="activityModalCloseBtn"><i class="fa-solid fa-xmark"></i></button></div>
     <div class="modal-body">
       <form id="activityForm" class="form-grid">
-        <div class="form-field"><label>Tanggal</label><input type="date" id="actTanggal" required /></div>
-        <div class="form-field"><label>Shift</label>
-          <select id="actShift" required><option value="">Pilih shift</option><option>Shift 1</option><option>Shift 2</option><option>Shift 3</option></select>
+        <div class="form-field"><label data-i18n="form_tanggal_label">Tanggal</label><input type="date" id="actTanggal" required /></div>
+        <div class="form-field"><label data-i18n="form_shift_label">Shift</label>
+          <select id="actShift" required><option value="" data-i18n="form_shift_placeholder">Pilih shift</option><option value="Shift 1">Shift 1</option><option value="Shift 2">Shift 2</option><option value="Shift 3">Shift 3</option></select>
         </div>
-        <div class="form-field"><label>Teknisi</label><input type="text" id="actTeknisi" placeholder="Nama teknisi" required /></div>
-        <div class="form-field"><label>Area</label><input type="text" id="actArea" placeholder="Area / line" required /></div>
-        <div class="form-field"><label>Mesin</label>
-          <select id="actMesin" required><option value="">Pilih mesin</option></select>
+        <div class="form-field"><label data-i18n="form_teknisi_label">Teknisi</label><input type="text" id="actTeknisi" placeholder="Nama teknisi" data-i18n-placeholder="form_teknisi_placeholder" required /></div>
+        <div class="form-field"><label data-i18n="form_area_label">Area</label><input type="text" id="actArea" placeholder="Area / line" data-i18n-placeholder="form_area_placeholder" required /></div>
+        <div class="form-field"><label data-i18n="form_mesin_label">Mesin</label>
+          <select id="actMesin" required><option value="" data-i18n="form_mesin_placeholder">Pilih mesin</option></select>
         </div>
-        <div class="form-field"><label>Status</label>
-          <select id="actStatus" required><option value="">Pilih status</option><option>Open</option><option>In Progress</option><option>Closed</option></select>
+        <div class="form-field"><label data-i18n="form_status_label">Status</label>
+          <select id="actStatus" required><option value="" data-i18n="form_status_placeholder">Pilih status</option><option value="Open">Open</option><option value="In Progress">In Progress</option><option value="Closed">Closed</option></select>
         </div>
-        <div class="form-field" style="grid-column:1/-1;"><label>Issue</label><textarea id="actIssue" placeholder="Deskripsikan issue" required></textarea></div>
-        <div class="form-field" style="grid-column:1/-1;"><label>Action</label><textarea id="actAction" placeholder="Tindakan yang dilakukan"></textarea></div>
-        <div class="form-field" style="grid-column:1/-1;"><label>Remark</label><textarea id="actRemark" placeholder="Catatan tambahan"></textarea></div>
+        <div class="form-field" style="grid-column:1/-1;"><label data-i18n="form_issue_label">Issue</label><textarea id="actIssue" placeholder="Deskripsikan issue" data-i18n-placeholder="form_issue_placeholder" required></textarea></div>
+        <div class="form-field" style="grid-column:1/-1;"><label data-i18n="form_action_label">Action</label><textarea id="actAction" placeholder="Tindakan yang dilakukan" data-i18n-placeholder="form_action_placeholder"></textarea></div>
+        <div class="form-field" style="grid-column:1/-1;"><label data-i18n="form_remark_label">Remark</label><textarea id="actRemark" placeholder="Catatan tambahan" data-i18n-placeholder="form_remark_placeholder"></textarea></div>
         <div class="form-actions" style="grid-column:1/-1;">
-          <button type="button" class="btn btn-outline" id="btnCancelActivity">Batal</button>
-          <button type="submit" class="btn btn-primary" id="btnSubmitActivity"><i class="fa-solid fa-paper-plane"></i> Simpan</button>
+          <button type="button" class="btn btn-outline" id="btnCancelActivity" data-i18n="btn_cancel">Batal</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitActivity"><i class="fa-solid fa-paper-plane"></i> <span data-i18n="btn_save">Simpan</span></button>
         </div>
       </form>
     </div>
@@ -705,7 +744,8 @@ const CONFIG = {
     { id:'activities', label:'Activities',      icon:'fa-clipboard-list',        title:'Activities', subtitle:'Input & riwayat shift log' },
     { id:'sparepart',  label:'Parts & Inventory', icon:'fa-boxes-stacked',       title:'Parts & Inventory', subtitle:'Monitoring stok sparepart' },
     { id:'meter',      label:'Meters',          icon:'fa-gauge',                 title:'Meters', subtitle:'Running hour & jadwal PM' },
-    { id:'po',         label:'Purchase Orders', icon:'fa-file-invoice-dollar',   title:'Purchase Orders', subtitle:'Status pengadaan sparepart' }
+    { id:'po',         label:'Purchase Orders', icon:'fa-file-invoice-dollar',   title:'Purchase Orders', subtitle:'Status pengadaan sparepart' },
+    { id:'settings',   label:'Settings',        icon:'fa-gear',                  title:'Settings', subtitle:'Preferensi aplikasi' }
   ],
   CHART_COLORS:['#0000FF','#4F7DFF','#16A34A','#F59E0B','#DC2626','#9333EA','#0D9488','#EA580C','#0891B2','#DB2777']
 };
@@ -762,7 +802,7 @@ function toMinutes(v){
 function formatDuration(totalMinutes){
   const h = Math.floor(totalMinutes/60);
   const m = Math.round(totalMinutes%60);
-  return `${h}j ${m}m`;
+  return `${h}${t('unit_hour_short')} ${m}${t('unit_minute_short')}`;
 }
 
 function isClosedStatus(status){
@@ -803,6 +843,8 @@ const I18N = {
     tooltip_refresh:'Refresh data', tooltip_notif:'Notifikasi', tooltip_dark:'Dark mode',
     tooltip_fullscreen:'Fullscreen', tooltip_print:'Print dashboard',
     notif_title:'Notifikasi', notif_count:(n)=>`${n} baru`, notif_empty:'Tidak ada notifikasi',
+    notif_out_of_stock:(name)=>`Stok habis: ${name}`, notif_pr_delayed:(pr,days)=>`PR ${pr} tertunda ${days} hari`,
+    status_normal:'Normal',
     btn_export_csv:'Export CSV', btn_refresh:'Refresh', btn_add_activity:'Tambahkan Aktivitas',
     btn_cancel:'Batal', btn_save:'Simpan', btn_save_loading:'Mengirim…', btn_export:'Export',
     page_overview_title:'Overview Dashboard',
@@ -827,6 +869,7 @@ const I18N = {
     kpi_corrective:'Corrective Action', kpi_corrective_sub:'Tindakan korektif tercatat',
     kpi_preventive:'Preventive Action', kpi_preventive_sub:'Tindakan preventif tercatat',
     unit_hour_short:'j', unit_minute_short:'m',
+    unit_minutes_label:'Menit', unit_incidents_label:'Kejadian', unit_used_label:'Terpakai',
     page_activities_title:'Activities', page_activities_subtitle:'Riwayat shift log teknisi',
     modal_add_activity_title:'Tambahkan Aktivitas',
     form_tanggal_label:'Tanggal', form_shift_label:'Shift', form_shift_placeholder:'Pilih shift',
@@ -877,6 +920,8 @@ const I18N = {
     tooltip_refresh:'Refresh data', tooltip_notif:'Notifications', tooltip_dark:'Dark mode',
     tooltip_fullscreen:'Fullscreen', tooltip_print:'Print dashboard',
     notif_title:'Notifications', notif_count:(n)=>`${n} new`, notif_empty:'No notifications',
+    notif_out_of_stock:(name)=>`Out of stock: ${name}`, notif_pr_delayed:(pr,days)=>`PR ${pr} delayed ${days} days`,
+    status_normal:'Normal',
     btn_export_csv:'Export CSV', btn_refresh:'Refresh', btn_add_activity:'Add Activity',
     btn_cancel:'Cancel', btn_save:'Save', btn_save_loading:'Sending…', btn_export:'Export',
     page_overview_title:'Overview Dashboard',
@@ -901,6 +946,7 @@ const I18N = {
     kpi_corrective:'Corrective Actions', kpi_corrective_sub:'Corrective actions logged',
     kpi_preventive:'Preventive Actions', kpi_preventive_sub:'Preventive actions logged',
     unit_hour_short:'h', unit_minute_short:'m',
+    unit_minutes_label:'Minutes', unit_incidents_label:'Incidents', unit_used_label:'Used',
     page_activities_title:'Activities', page_activities_subtitle:'Technician shift log history',
     modal_add_activity_title:'Add Activity',
     form_tanggal_label:'Date', form_shift_label:'Shift', form_shift_placeholder:'Select shift',
@@ -964,6 +1010,10 @@ function setLanguage(lang){
   safeStorage.set('ferrum_lang', STATE.lang);
   applyTranslations();
   renderSettingsPage();
+  // Tabel di-cache (lihat createDataTable) — toolbar-nya (placeholder cari, tombol export,
+  // opsi filter default) hanya dibangun sekali saat pertama dibuat. Reset cache di sini
+  // supaya toolbar ikut dibangun ulang dalam bahasa baru saat halaman aktif dirender ulang.
+  STATE.tables = {};
   if(STATE.loaded) renderCurrentPage();
   showToast(t('settings_lang_changed'), 'success', 2000);
 }
@@ -1177,7 +1227,7 @@ async function loadAllData(silent=false){
       failed.forEach(f=>console.error(f.reason));
       showToast(failed[0].reason.message || 'Sebagian data gagal dimuat.', 'error');
     } else if(!silent){
-      showToast('Data berhasil dimuat.', 'success', 2200);
+      showToast(t('toast_data_loaded'), 'success', 2200);
     }
     STATE.loaded = true;
     renderCurrentPage();
@@ -1274,9 +1324,9 @@ function createDataTable({ id, columns, getData, filters=[], pageSize=8, onRowCl
 
   root.innerHTML = `
     <div class="dt-toolbar">
-      <div class="dt-search"><i class="fa-solid fa-magnifying-glass"></i><input type="text" class="dt-search-input" placeholder="Cari..." /></div>
+      <div class="dt-search"><i class="fa-solid fa-magnifying-glass"></i><input type="text" class="dt-search-input" placeholder="${t('dt_search_placeholder')}" /></div>
       <div class="dt-filters"></div>
-      <div class="dt-toolbar-actions"><button class="btn btn-ghost btn-sm dt-export-btn"><i class="fa-solid fa-file-csv"></i> Export</button></div>
+      <div class="dt-toolbar-actions"><button class="btn btn-ghost btn-sm dt-export-btn"><i class="fa-solid fa-file-csv"></i> ${t('dt_export')}</button></div>
     </div>
     <div class="dt-scroll"><table class="dt-table"><thead><tr></tr></thead><tbody></tbody></table></div>
     <div class="dt-footer"><span class="dt-info"></span><div class="dt-pagination"></div></div>`;
@@ -1344,7 +1394,7 @@ function createDataTable({ id, columns, getData, filters=[], pageSize=8, onRowCl
 
     if(pageRows.length === 0){
       tbody.innerHTML = `<tr><td colspan="${columns.length}">
-        <div class="state-block"><i class="fa-solid fa-inbox"></i><b>Tidak ada data</b><span>Coba ubah kata kunci pencarian atau filter.</span></div>
+        <div class="state-block"><i class="fa-solid fa-inbox"></i><b>${t('dt_empty_title')}</b><span>${t('dt_empty_sub')}</span></div>
       </td></tr>`;
     }else{
       tbody.innerHTML = pageRows.map((r,idx)=>`<tr ${onRowClick?'class="dt-row-clickable"':''} data-idx="${idx}">${
@@ -1355,7 +1405,7 @@ function createDataTable({ id, columns, getData, filters=[], pageSize=8, onRowCl
       }
     }
 
-    infoEl.textContent = all.length ? `Menampilkan ${start+1}-${Math.min(start+pageRows.length,all.length)} dari ${all.length} data` : 'Tidak ada data';
+    infoEl.textContent = all.length ? t('dt_showing', start+1, Math.min(start+pageRows.length,all.length), all.length) : t('dt_no_data');
 
     let pagerHtml = `<button class="dt-page-btn" data-p="prev" ${state.page<=1?'disabled':''}><i class="fa-solid fa-chevron-left"></i></button>`;
     for(let p=1;p<=totalPages;p++){
@@ -1383,7 +1433,7 @@ function createDataTable({ id, columns, getData, filters=[], pageSize=8, onRowCl
  * 9. CSV EXPORT
  * ---------------------------------------------------------------------- */
 function exportCSV(filename, columns, rows){
-  if(!rows || !rows.length){ showToast('Tidak ada data untuk diekspor.', 'warning'); return; }
+  if(!rows || !rows.length){ showToast(t('toast_export_empty'), 'warning'); return; }
   const esc = v=>{
     let s = v instanceof Date ? formatDate(v) : String(v ?? '');
     s = s.replace(/<[^>]*>/g,'');
@@ -1399,7 +1449,7 @@ function exportCSV(filename, columns, rows){
   a.href = url; a.download = `${filename}_${new Date().toISOString().slice(0,10)}.csv`;
   document.body.appendChild(a); a.click(); a.remove();
   URL.revokeObjectURL(url);
-  showToast('Export CSV berhasil.', 'success', 2000);
+  showToast(t('toast_export_success'), 'success', 2000);
 }
 
 /* ---------------------------------------------------------------------- *
@@ -1441,16 +1491,16 @@ function renderKpiCards(){
   const preventiveCount = ors.filter(r=> String(getField(r,'Preventive Action')||'').trim()).length;
 
   const cards = [
-    { label:'Total Downtime', value:formatDuration(totalDowntimeMin), sub:'Total durasi seluruh kejadian', icon:'fa-clock', cls:'bg-primary' },
-    { label:'Total Breakdown', value:totalEvents.toLocaleString('id-ID'), sub:'Jumlah kejadian downtime', icon:'fa-triangle-exclamation', cls:'bg-danger' },
-    { label:'Availability', value:availability.toFixed(1)+'%', sub:'Estimasi ketersediaan mesin', icon:'fa-gauge-high', cls:'bg-success' },
-    { label:'Total Duration', value:formatDuration(avgDuration), sub:'Rata-rata durasi / kejadian', icon:'fa-hourglass-half', cls:'bg-secondary' },
-    { label:'Open Issue', value:openIssue.toLocaleString('id-ID'), sub:'Belum selesai ditangani', icon:'fa-circle-exclamation', cls:'bg-warning' },
-    { label:'Closed Issue', value:closedIssue.toLocaleString('id-ID'), sub:'Sudah selesai ditangani', icon:'fa-circle-check', cls:'bg-success' },
-    { label:'Sparepart Digunakan', value:sparepartUsed.toLocaleString('id-ID'), sub:'Kejadian dengan sparepart', icon:'fa-boxes-stacked', cls:'bg-purple' },
-    { label:'Jumlah Root Cause', value:rootCauseCount.toLocaleString('id-ID'), sub:'Penyebab unik teridentifikasi', icon:'fa-magnifying-glass-chart', cls:'bg-teal' },
-    { label:'Corrective Action', value:correctiveCount.toLocaleString('id-ID'), sub:'Tindakan korektif tercatat', icon:'fa-screwdriver-wrench', cls:'bg-primary' },
-    { label:'Preventive Action', value:preventiveCount.toLocaleString('id-ID'), sub:'Tindakan preventif tercatat', icon:'fa-shield-heart', cls:'bg-secondary' }
+    { label:t('kpi_total_downtime'), value:formatDuration(totalDowntimeMin), sub:t('kpi_total_downtime_sub'), icon:'fa-clock', cls:'bg-primary' },
+    { label:t('kpi_total_breakdown'), value:totalEvents.toLocaleString('id-ID'), sub:t('kpi_total_breakdown_sub'), icon:'fa-triangle-exclamation', cls:'bg-danger' },
+    { label:t('kpi_availability'), value:availability.toFixed(1)+'%', sub:t('kpi_availability_sub'), icon:'fa-gauge-high', cls:'bg-success' },
+    { label:t('kpi_total_duration'), value:formatDuration(avgDuration), sub:t('kpi_total_duration_sub'), icon:'fa-hourglass-half', cls:'bg-secondary' },
+    { label:t('kpi_open_issue'), value:openIssue.toLocaleString('id-ID'), sub:t('kpi_open_issue_sub'), icon:'fa-circle-exclamation', cls:'bg-warning' },
+    { label:t('kpi_closed_issue'), value:closedIssue.toLocaleString('id-ID'), sub:t('kpi_closed_issue_sub'), icon:'fa-circle-check', cls:'bg-success' },
+    { label:t('kpi_sparepart_used'), value:sparepartUsed.toLocaleString('id-ID'), sub:t('kpi_sparepart_used_sub'), icon:'fa-boxes-stacked', cls:'bg-purple' },
+    { label:t('kpi_root_cause'), value:rootCauseCount.toLocaleString('id-ID'), sub:t('kpi_root_cause_sub'), icon:'fa-magnifying-glass-chart', cls:'bg-teal' },
+    { label:t('kpi_corrective'), value:correctiveCount.toLocaleString('id-ID'), sub:t('kpi_corrective_sub'), icon:'fa-screwdriver-wrench', cls:'bg-primary' },
+    { label:t('kpi_preventive'), value:preventiveCount.toLocaleString('id-ID'), sub:t('kpi_preventive_sub'), icon:'fa-shield-heart', cls:'bg-secondary' }
   ];
 
   grid.innerHTML = cards.map(c=>`
@@ -1488,7 +1538,7 @@ function renderCharts(){
   CONFIG.MACHINES.forEach(m=> byMesin[m]=0);
   ors.forEach(r=>{ const m=String(getField(r,'Mesin')||'Lainnya').trim(); byMesin[m]=(byMesin[m]||0)+toMinutes(getField(r,'Duration')); });
   destroyChart('mesin');
-  STATE.charts.mesin = new Chart($('#chartMesin'), { type:'bar', data:{ labels:Object.keys(byMesin), datasets:[{ label:'Menit', data:Object.values(byMesin), backgroundColor:colors[0], borderRadius:8, maxBarThickness:38 }] }, options: baseChartOptions() });
+  STATE.charts.mesin = new Chart($('#chartMesin'), { type:'bar', data:{ labels:Object.keys(byMesin), datasets:[{ label:t('unit_minutes_label'), data:Object.values(byMesin), backgroundColor:colors[0], borderRadius:8, maxBarThickness:38 }] }, options: baseChartOptions() });
 
   // --- Downtime per Area ---
   const byArea = {};
@@ -1504,28 +1554,28 @@ function renderCharts(){
     return new Date(ya,ma-1,da) - new Date(yb,mb-1,db);
   }).slice(-14);
   destroyChart('harian');
-  STATE.charts.harian = new Chart($('#chartHarian'), { type:'line', data:{ labels:sortedDays, datasets:[{ label:'Menit', data:sortedDays.map(d=>dayMap[d]), borderColor:colors[0], backgroundColor:'rgba(0,0,255,.1)', fill:true, tension:.35, pointRadius:3 }] }, options: baseChartOptions() });
+  STATE.charts.harian = new Chart($('#chartHarian'), { type:'line', data:{ labels:sortedDays, datasets:[{ label:t('unit_minutes_label'), data:sortedDays.map(d=>dayMap[d]), borderColor:colors[0], backgroundColor:'rgba(0,0,255,.1)', fill:true, tension:.35, pointRadius:3 }] }, options: baseChartOptions() });
 
   // --- Top Komponen Bermasalah (dari kolom Line, diisi loadORS() dengan nama komponen mesin) ---
   const byComponent = {};
   ors.forEach(r=>{ const c=String(getField(r,'Line')||'').trim(); if(c) byComponent[c]=(byComponent[c]||0)+toMinutes(getField(r,'Duration')); });
   const topComponent = Object.entries(byComponent).sort((a,b)=>b[1]-a[1]).slice(0,5);
   destroyChart('component');
-  STATE.charts.component = new Chart($('#chartComponent'), { type:'bar', data:{ labels:topComponent.map(x=>x[0]), datasets:[{ label:'Menit', data:topComponent.map(x=>x[1]), backgroundColor:colors[3], borderRadius:8 }] }, options: baseChartOptions({ indexAxis:'y' }) });
+  STATE.charts.component = new Chart($('#chartComponent'), { type:'bar', data:{ labels:topComponent.map(x=>x[0]), datasets:[{ label:t('unit_minutes_label'), data:topComponent.map(x=>x[1]), backgroundColor:colors[3], borderRadius:8 }] }, options: baseChartOptions({ indexAxis:'y' }) });
 
   // --- Top Root Cause ---
   const byCause = {};
   ors.forEach(r=>{ const c=String(getField(r,'Root Cause')||'').trim(); if(c) byCause[c]=(byCause[c]||0)+1; });
   const topCause = Object.entries(byCause).sort((a,b)=>b[1]-a[1]).slice(0,5);
   destroyChart('rootcause');
-  STATE.charts.rootcause = new Chart($('#chartRootCause'), { type:'bar', data:{ labels:topCause.map(x=>x[0]), datasets:[{ label:'Kejadian', data:topCause.map(x=>x[1]), backgroundColor:colors[4], borderRadius:8 }] }, options: baseChartOptions({ indexAxis:'y' }) });
+  STATE.charts.rootcause = new Chart($('#chartRootCause'), { type:'bar', data:{ labels:topCause.map(x=>x[0]), datasets:[{ label:t('unit_incidents_label'), data:topCause.map(x=>x[1]), backgroundColor:colors[4], borderRadius:8 }] }, options: baseChartOptions({ indexAxis:'y' }) });
 
   // --- Top Sparepart ---
   const bySpare = {};
   ors.forEach(r=>{ const s=String(getField(r,'Sparepart')||'').trim(); if(s) bySpare[s]=(bySpare[s]||0)+1; });
   const topSpare = Object.entries(bySpare).sort((a,b)=>b[1]-a[1]).slice(0,5);
   destroyChart('topsparepart');
-  STATE.charts.topsparepart = new Chart($('#chartTopSparepart'), { type:'bar', data:{ labels:topSpare.map(x=>x[0]), datasets:[{ label:'Terpakai', data:topSpare.map(x=>x[1]), backgroundColor:colors[5], borderRadius:8 }] }, options: baseChartOptions({ indexAxis:'y' }) });
+  STATE.charts.topsparepart = new Chart($('#chartTopSparepart'), { type:'bar', data:{ labels:topSpare.map(x=>x[0]), datasets:[{ label:t('unit_used_label'), data:topSpare.map(x=>x[1]), backgroundColor:colors[5], borderRadius:8 }] }, options: baseChartOptions({ indexAxis:'y' }) });
 
   // --- Status Issue ---
   const allIssues = [...ors, ...STATE.data.activities];
@@ -1540,7 +1590,7 @@ function renderCharts(){
   const monthKeys = Object.keys(byMonth).sort();
   const monthLabels = monthKeys.map(k=>{ const [y,m]=k.split('-'); return new Date(y,m-1,1).toLocaleDateString('id-ID',{month:'short',year:'2-digit'}); });
   destroyChart('monthly');
-  STATE.charts.monthly = new Chart($('#chartMonthly'), { type:'line', data:{ labels:monthLabels, datasets:[{ label:'Kejadian', data:monthKeys.map(k=>byMonth[k]), borderColor:colors[1], backgroundColor:'rgba(79,125,255,.12)', fill:true, tension:.3, pointRadius:3 }] }, options: baseChartOptions() });
+  STATE.charts.monthly = new Chart($('#chartMonthly'), { type:'line', data:{ labels:monthLabels, datasets:[{ label:t('unit_incidents_label'), data:monthKeys.map(k=>byMonth[k]), borderColor:colors[1], backgroundColor:'rgba(79,125,255,.12)', fill:true, tension:.3, pointRadius:3 }] }, options: baseChartOptions() });
 }
 
 function renderOrsTable(){
@@ -1549,8 +1599,8 @@ function renderOrsTable(){
     id:'tbl-ors', pageSize:8, exportName:'latest_downtime',
     getData:()=> STATE.data.ors,
     filters:[
-      { key:'Mesin', label:'Semua Mesin', options:CONFIG.MACHINES },
-      { key:'Status', label:'Semua Status', options:uniqueValues(STATE.data.ors,'Status') }
+      { key:'Mesin', label:t('filter_all_machine'), options:CONFIG.MACHINES },
+      { key:'Status', label:t('filter_all_status'), options:uniqueValues(STATE.data.ors,'Status') }
     ],
     columns:[
       { key:'Tanggal', label:'Tanggal' },
@@ -1563,7 +1613,7 @@ function renderOrsTable(){
       { key:'Status', label:'Status', render:r=> statusBadge(getField(r,'Status')) },
       { key:'Duration', label:'Durasi', render:r=> formatDuration(toMinutes(getField(r,'Duration'))) }
     ],
-    onRowClick:(row)=> openDetailModal('Detail Downtime', row, ['Tanggal','Shift','Area','Line','Mesin','Downtime','Root Cause','Temporary Action','Corrective Action','Preventive Action','Sparepart','PIC','Status','Duration'])
+    onRowClick:(row)=> openDetailModal(t('modal_detail_downtime'), row, ['Tanggal','Shift','Area','Line','Mesin','Downtime','Root Cause','Temporary Action','Corrective Action','Preventive Action','Sparepart','PIC','Status','Duration'])
   });
 }
 
@@ -1585,8 +1635,8 @@ function renderActivitiesHistory(){
     id:'tbl-activities', pageSize:8, exportName:'activities_history',
     getData:()=> STATE.data.activities,
     filters:[
-      { key:'Status', label:'Semua Status', options:uniqueValues(STATE.data.activities,'Status') },
-      { key:'Mesin', label:'Semua Mesin', options:uniqueValues(STATE.data.activities,'Mesin') }
+      { key:'Status', label:t('filter_all_status'), options:uniqueValues(STATE.data.activities,'Status') },
+      { key:'Mesin', label:t('filter_all_machine'), options:uniqueValues(STATE.data.activities,'Mesin') }
     ],
     columns:[
       { key:'Tanggal', label:'Tanggal' },
@@ -1597,7 +1647,7 @@ function renderActivitiesHistory(){
       { key:'Issue', label:'Issue' },
       { key:'Status', label:'Status', render:r=> statusBadge(getField(r,'Status')) }
     ],
-    onRowClick:(row)=> openDetailModal('Detail Shift Log', row, ['Tanggal','Shift','Teknisi','Area','Mesin','Issue','Action','Status','Remark'])
+    onRowClick:(row)=> openDetailModal(t('modal_detail_shift_log'), row, ['Tanggal','Shift','Teknisi','Area','Mesin','Issue','Action','Status','Remark'])
   });
 }
 
@@ -1628,25 +1678,28 @@ async function submitActivity(payload){
 function movementStatus(row){
   const stock = Number(getField(row,'Stock'))||0;
   const dist = normKey(getField(row,'Distribution 6M'));
-  if(stock <= 0) return { label:'Out of Stock', cls:'badge-red' };
-  if(dist.includes('fast')) return { label:'Fast Moving', cls:'badge-green' };
-  if(dist.includes('slow')) return { label:'Slow Moving', cls:'badge-amber' };
-  return { label:'Normal', cls:'badge-gray' };
+  if(stock <= 0) return { code:'out', cls:'badge-red' };
+  if(dist.includes('fast')) return { code:'fast', cls:'badge-green' };
+  if(dist.includes('slow')) return { code:'slow', cls:'badge-amber' };
+  return { code:'normal', cls:'badge-gray' };
+}
+function movementStatusLabel(code){
+  return { out:t('kpi_parts_out'), fast:t('kpi_parts_fast'), slow:t('kpi_parts_slow'), normal:t('status_normal') }[code] || code;
 }
 
 function renderSparepartKpi(){
   const sp = STATE.data.sparepart;
   const grid = $('#spKpiGrid');
-  const out = sp.filter(r=> movementStatus(r).label==='Out of Stock').length;
-  const fast = sp.filter(r=> movementStatus(r).label==='Fast Moving').length;
-  const slow = sp.filter(r=> movementStatus(r).label==='Slow Moving').length;
+  const out = sp.filter(r=> movementStatus(r).code==='out').length;
+  const fast = sp.filter(r=> movementStatus(r).code==='fast').length;
+  const slow = sp.filter(r=> movementStatus(r).code==='slow').length;
   const totalValue = sp.reduce((s,r)=> s + (Number(getField(r,'Total Value'))||0), 0);
   const cards = [
-    { label:'Total Item', value:sp.length.toLocaleString('id-ID'), icon:'fa-boxes-stacked', cls:'bg-primary' },
-    { label:'Total Nilai Inventory', value:'Rp '+totalValue.toLocaleString('id-ID'), icon:'fa-sack-dollar', cls:'bg-secondary' },
-    { label:'Fast Moving', value:fast.toLocaleString('id-ID'), icon:'fa-circle-check', cls:'bg-success' },
-    { label:'Slow Moving', value:slow.toLocaleString('id-ID'), icon:'fa-triangle-exclamation', cls:'bg-warning' },
-    { label:'Stok Habis', value:out.toLocaleString('id-ID'), icon:'fa-circle-xmark', cls:'bg-danger' }
+    { label:t('kpi_parts_total'), value:sp.length.toLocaleString('id-ID'), icon:'fa-boxes-stacked', cls:'bg-primary' },
+    { label:t('kpi_parts_total_value'), value:'Rp '+totalValue.toLocaleString('id-ID'), icon:'fa-sack-dollar', cls:'bg-secondary' },
+    { label:t('kpi_parts_fast'), value:fast.toLocaleString('id-ID'), icon:'fa-circle-check', cls:'bg-success' },
+    { label:t('kpi_parts_slow'), value:slow.toLocaleString('id-ID'), icon:'fa-triangle-exclamation', cls:'bg-warning' },
+    { label:t('kpi_parts_out'), value:out.toLocaleString('id-ID'), icon:'fa-circle-xmark', cls:'bg-danger' }
   ];
   grid.innerHTML = cards.map(c=>`<div class="kpi-card"><div class="kpi-top"><div class="kpi-icon ${c.cls}"><i class="fa-solid ${c.icon}"></i></div></div><div class="kpi-value">${c.value}</div><div class="kpi-label">${c.label}</div></div>`).join('');
 }
@@ -1658,8 +1711,8 @@ function renderSparepartTable(){
     id:'tbl-sparepart', pageSize:8, exportName:'sparepart',
     getData:()=> STATE.data.sparepart,
     filters:[
-      { key:'Mesin', label:'Semua Mesin', options:uniqueValues(STATE.data.sparepart,'Mesin') },
-      { key:'Jenis Barang', label:'Semua Kategori', options:uniqueValues(STATE.data.sparepart,'Jenis Barang') }
+      { key:'Mesin', label:t('filter_all_machine'), options:uniqueValues(STATE.data.sparepart,'Mesin') },
+      { key:'Jenis Barang', label:t('filter_all_category'), options:uniqueValues(STATE.data.sparepart,'Jenis Barang') }
     ],
     columns:[
       { key:'No SAP', label:'Part Number' },
@@ -1672,10 +1725,10 @@ function renderSparepartTable(){
       { key:'Last Lead Time Order on Days', label:'Lead Time (hari)' },
       { key:'Status', label:'Status', searchable:false, render:r=>{
           const s = movementStatus(r);
-          return `<span class="badge ${s.cls}">${s.label}</span>`;
+          return `<span class="badge ${s.cls}">${movementStatusLabel(s.code)}</span>`;
         } }
     ],
-    onRowClick:(row)=> openDetailModal('Detail Part', row, ['No SAP','Nama Material','Jenis Barang','Mesin','Area','Stock','Satuan','Harga @','Total Value','Last Lead Time Order on Days','Distribution 6M','Racking','Sloc','Mapping'])
+    onRowClick:(row)=> openDetailModal(t('modal_detail_part'), row, ['No SAP','Nama Material','Jenis Barang','Mesin','Area','Stock','Satuan','Harga @','Total Value','Last Lead Time Order on Days','Distribution 6M','Racking','Sloc','Mapping'])
   });
 }
 
@@ -1693,15 +1746,15 @@ function renderMeterKpi(){
   const turun = rows.filter(r=>r._delta<0).length;
   const stagnan = rows.filter(r=>r._delta===0).length;
   const cards = [
-    { label:'Total Komponen', value:rows.length, icon:'fa-gauge', cls:'bg-primary' },
-    { label:'Total Area', value:areaCount, icon:'fa-diagram-project', cls:'bg-secondary' },
-    { label:'Naik Minggu Ini', value:naik, icon:'fa-arrow-trend-up', cls:'bg-success' },
-    { label:'Turun', value:turun, icon:'fa-arrow-trend-down', cls:'bg-danger' },
-    { label:'Stagnan', value:stagnan, icon:'fa-minus', cls:'bg-warning' }
+    { label:t('kpi_meters_total_component'), value:rows.length, icon:'fa-gauge', cls:'bg-primary' },
+    { label:t('kpi_meters_total_area'), value:areaCount, icon:'fa-diagram-project', cls:'bg-secondary' },
+    { label:t('kpi_meters_up'), value:naik, icon:'fa-arrow-trend-up', cls:'bg-success' },
+    { label:t('kpi_meters_down'), value:turun, icon:'fa-arrow-trend-down', cls:'bg-danger' },
+    { label:t('kpi_meters_flat'), value:stagnan, icon:'fa-minus', cls:'bg-warning' }
   ];
   grid.innerHTML = cards.map(c=>`<div class="kpi-card"><div class="kpi-top"><div class="kpi-icon ${c.cls}"><i class="fa-solid ${c.icon}"></i></div></div><div class="kpi-value">${c.value}</div><div class="kpi-label">${c.label}</div></div>`).join('');
   if(rows.length && rows[0]._latestWeek){
-    $('#meterSubtitle').textContent = `Running hour komponen per area — pembacaan terakhir: ${rows[0]._latestWeek}`;
+    $('#meterSubtitle').textContent = t('page_meters_subtitle_latest', rows[0]._latestWeek);
   }
 }
 
@@ -1713,7 +1766,7 @@ function renderMeterPage(){
   STATE.tables.meter = createDataTable({
     id:'tbl-meter', pageSize:10, exportName:'running_hour',
     getData:()=> STATE.data.meter,
-    filters:[ { key:'Area', label:'Semua Area', options:uniqueValues(STATE.data.meter,'Area') } ],
+    filters:[ { key:'Area', label:t('filter_all_area'), options:uniqueValues(STATE.data.meter,'Area') } ],
     columns:[
       { key:'Area', label:'Area' },
       { key:'Nama Mesin', label:'Komponen' },
@@ -1729,7 +1782,7 @@ function renderMeterPage(){
     ],
     onRowClick:(row)=>{
       const weekKeys = Object.keys(row).filter(k=>/^W\d+$/i.test(k)).sort((a,b)=>parseInt(a.slice(1))-parseInt(b.slice(1)));
-      openDetailModal('Detail Running Hour', row, ['Area','Nama Mesin','Unit', ...weekKeys]);
+      openDetailModal(t('modal_detail_running_hour'), row, ['Area','Nama Mesin','Unit', ...weekKeys]);
     }
   });
 }
@@ -1757,11 +1810,11 @@ function renderPoKpi(){
   const avgLeadTime = leadTimes.length ? Math.round(leadTimes.reduce((a,b)=>a+b,0)/leadTimes.length) : 0;
   const totalValue = po.reduce((s,r)=> s + (Number(getField(r,'Qty'))||0) * (Number(getField(r,'Harga PR /pcs'))||0), 0);
   const cards = [
-    { label:'Total PR/PO', value:po.length.toLocaleString('id-ID'), icon:'fa-file-invoice-dollar', cls:'bg-primary' },
-    { label:'Sudah Diterima', value:received.toLocaleString('id-ID'), icon:'fa-circle-check', cls:'bg-success' },
-    { label:'Masih Berjalan', value:onOrder.toLocaleString('id-ID'), icon:'fa-truck-fast', cls:'bg-warning' },
-    { label:'Rata-rata Lead Time', value:avgLeadTime+' hari', icon:'fa-hourglass-half', cls:'bg-secondary' },
-    { label:'Total Nilai', value:'Rp '+totalValue.toLocaleString('id-ID'), icon:'fa-sack-dollar', cls:'bg-purple' }
+    { label:t('kpi_po_total'), value:po.length.toLocaleString('id-ID'), icon:'fa-file-invoice-dollar', cls:'bg-primary' },
+    { label:t('kpi_po_received'), value:received.toLocaleString('id-ID'), icon:'fa-circle-check', cls:'bg-success' },
+    { label:t('kpi_po_ongoing'), value:onOrder.toLocaleString('id-ID'), icon:'fa-truck-fast', cls:'bg-warning' },
+    { label:t('kpi_po_avg_leadtime'), value:avgLeadTime+' '+t('kpi_po_leadtime_unit'), icon:'fa-hourglass-half', cls:'bg-secondary' },
+    { label:t('kpi_po_total_value'), value:'Rp '+totalValue.toLocaleString('id-ID'), icon:'fa-sack-dollar', cls:'bg-purple' }
   ];
   grid.innerHTML = cards.map(c=>`<div class="kpi-card"><div class="kpi-top"><div class="kpi-icon ${c.cls}"><i class="fa-solid ${c.icon}"></i></div></div><div class="kpi-value">${c.value}</div><div class="kpi-label">${c.label}</div></div>`).join('');
 }
@@ -1773,8 +1826,8 @@ function renderPoTable(){
     id:'tbl-po', pageSize:8, exportName:'purchase_orders',
     getData:()=> STATE.data.po,
     filters:[
-      { key:'Status', label:'Semua Status', options:uniqueValues(STATE.data.po,'Status') },
-      { key:'Kategori', label:'Semua Kategori', options:uniqueValues(STATE.data.po,'Kategori') }
+      { key:'Status', label:t('filter_all_status'), options:uniqueValues(STATE.data.po,'Status') },
+      { key:'Kategori', label:t('filter_all_category'), options:uniqueValues(STATE.data.po,'Kategori') }
     ],
     columns:[
       { key:'No PR', label:'PR' },
@@ -1786,7 +1839,7 @@ function renderPoTable(){
       { key:'Status', label:'Status', searchable:false, render:r=> poBadge(getField(r,'Status')) },
       { key:'Lead Time PR-Barang Datang', label:'Lead Time (hari)' }
     ],
-    onRowClick:(row)=> openDetailModal('Detail Purchase Order', row, ['No','No PR','No PO','No GR','Deskripsi material','Qty','UOM','Kategori','Status','Tanggal PR','Tanggal Release PR','Tgl PO Release','Confirm deliv date','Tgl Barang Datang','Lead Time PR','Lead Time PO','Lead Time PR-Barang Datang','WO','Purpose','Kode PPM','Matrial Group','Harga PR /pcs'])
+    onRowClick:(row)=> openDetailModal(t('modal_detail_po'), row, ['No','No PR','No PO','No GR','Deskripsi material','Qty','UOM','Kategori','Status','Tanggal PR','Tanggal Release PR','Tgl PO Release','Confirm deliv date','Tgl Barang Datang','Lead Time PR','Lead Time PO','Lead Time PR-Barang Datang','WO','Purpose','Kode PPM','Matrial Group','Harga PR /pcs'])
   });
 }
 
@@ -1813,8 +1866,8 @@ function closeActivityModal(){ $('#activityModalBackdrop').classList.remove('sho
 function updateNotifications(){
   const list = [];
   STATE.data.sparepart.forEach(r=>{
-    if(movementStatus(r).label==='Out of Stock'){
-      list.push({ icon:'fa-boxes-stacked', cls:'bg-danger', title:`Stok habis: ${getField(r,'No SAP')||getField(r,'Nama Material')}`, sub:getField(r,'Nama Material') });
+    if(movementStatus(r).code==='out'){
+      list.push({ icon:'fa-boxes-stacked', cls:'bg-danger', title:t('notif_out_of_stock', getField(r,'No SAP')||getField(r,'Nama Material')), sub:getField(r,'Nama Material') });
     }
   });
   const now = new Date();
@@ -1823,17 +1876,17 @@ function updateNotifications(){
     const prDate = getField(r,'Tanggal PR');
     if(prDate instanceof Date){
       const days = Math.round((now-prDate)/86400000);
-      if(days>30) list.push({ icon:'fa-file-invoice-dollar', cls:'bg-warning', title:`PR ${getField(r,'No PR')||'-'} tertunda ${days} hari`, sub:getField(r,'Deskripsi material') });
+      if(days>30) list.push({ icon:'fa-file-invoice-dollar', cls:'bg-warning', title:t('notif_pr_delayed', getField(r,'No PR')||'-', days), sub:getField(r,'Deskripsi material') });
     }
   });
 
   const dot = $('#notifDot'); const count = $('#notifCount'); const listEl = $('#notifList');
-  if(list.length){ dot.classList.remove('hidden'); count.textContent = `${list.length} baru`; }
-  else{ dot.classList.add('hidden'); count.textContent = '0 baru'; }
+  if(list.length){ dot.classList.remove('hidden'); count.textContent = t('notif_count', list.length); }
+  else{ dot.classList.add('hidden'); count.textContent = t('notif_count', 0); }
 
   listEl.innerHTML = list.length ? list.map(n=>`
     <div class="notif-item"><div class="notif-icon ${n.cls}"><i class="fa-solid ${n.icon}"></i></div><div class="notif-text"><b>${escapeHtml(n.title)}</b><span>${escapeHtml(n.sub||'')}</span></div></div>
-  `).join('') : `<div class="state-block" style="padding:30px 16px;"><i class="fa-regular fa-bell-slash"></i><span>Tidak ada notifikasi</span></div>`;
+  `).join('') : `<div class="state-block" style="padding:30px 16px;"><i class="fa-regular fa-bell-slash"></i><span>${t('notif_empty')}</span></div>`;
 }
 
 /* ---------------------------------------------------------------------- *
@@ -1849,7 +1902,13 @@ function renderCurrentPage(){
     case 'sparepart': renderSparepartTable(); break;
     case 'meter': renderMeterPage(); break;
     case 'po': renderPoTable(); break;
+    case 'settings': renderSettingsPage(); break;
   }
+}
+
+/** Tandai kartu bahasa yang sedang aktif di halaman Settings. */
+function renderSettingsPage(){
+  $$('.lang-option').forEach(btn=> btn.classList.toggle('active', btn.dataset.lang===STATE.lang));
 }
 
 function navigateTo(pageId){
@@ -1888,7 +1947,7 @@ function updateClock(){
 }
 
 function toggleFullscreen(){
-  if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>showToast('Fullscreen tidak didukung browser ini.','warning'));
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>showToast(t('toast_fullscreen_unsupported'),'warning'));
   else document.exitFullscreen();
 }
 
@@ -1919,6 +1978,7 @@ function wireEvents(){
   $$('.nav-item[data-page]').forEach(btn=> btn.addEventListener('click', ()=> navigateTo(btn.dataset.page)));
   $('#btnLogout').addEventListener('click', logout);
   $('#btnCollapse').addEventListener('click', toggleSidebarCollapse);
+  $$('.lang-option').forEach(btn=> btn.addEventListener('click', ()=> setLanguage(btn.dataset.lang)));
   $('#btnHamburger').addEventListener('click', openDrawer);
   $('#overlayDrawer').addEventListener('click', closeDrawer);
 
@@ -1979,7 +2039,7 @@ function wireEvents(){
     const btn = $('#loginSubmitBtn');
     const errBox = $('#loginError');
     errBox.classList.remove('show');
-    btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner spin"></i> <span>Memproses…</span>';
+    btn.disabled = true; btn.innerHTML = `<i class="fa-solid fa-spinner spin"></i> <span>${t('login_submit_loading')}</span>`;
     try{
       await login($('#loginUsername').value.trim(), $('#loginPassword').value, $('#loginRemember').checked);
       await onLoginSuccess();
@@ -1987,7 +2047,7 @@ function wireEvents(){
       errBox.querySelector('span').textContent = err.message;
       errBox.classList.add('show');
     }finally{
-      btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> <span>Masuk</span>';
+      btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> <span>${t('login_submit')}</span>`;
     }
   });
 
@@ -2000,10 +2060,10 @@ function wireEvents(){
       Area: $('#actArea').value, Mesin: $('#actMesin').value, Issue: $('#actIssue').value,
       Action: $('#actAction').value, Status: $('#actStatus').value, Remark: $('#actRemark').value
     };
-    btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner spin"></i> Mengirim…';
+    btn.disabled = true; btn.innerHTML = `<i class="fa-solid fa-spinner spin"></i> ${t('btn_save_loading')}`;
     try{
       await submitActivity(payload);
-      showToast('Shift log berhasil disimpan.', 'success');
+      showToast(t('toast_activity_saved'), 'success');
       STATE.data.activities.unshift({ ...payload, Tanggal:new Date(payload.Tanggal) });
       $('#activityForm').reset();
       $('#actTeknisi').value = STATE.user?.nama || '';
@@ -2012,7 +2072,7 @@ function wireEvents(){
     }catch(err){
       showToast(err.message, 'error');
     }finally{
-      btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Simpan';
+      btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> ${t('btn_save')}`;
     }
   });
 
