@@ -907,7 +907,8 @@ const I18N = {
     kpi_parts_fast:'Fast Moving', kpi_parts_slow:'Slow Moving', kpi_parts_out:'Stok Habis',
     page_meters_title:'Meters', page_meters_subtitle_default:'Running hour komponen per area (mingguan)',
     page_meters_subtitle_latest:(w)=>`Running hour komponen per area — pembacaan terakhir: ${w}`,
-    meter_prev_week:'Minggu lalu',
+    meter_prev_week:'Minggu lalu', col_component:'Komponen', col_unit:'Unit',
+    meter_detail_week:'Minggu', meter_detail_value:'Nilai',
     page_po_title:'Purchase Orders',
     page_po_subtitle:'Status pengadaan sparepart & material — status ditentukan otomatis dari kolom tanggal PR/PO/GR',
     kpi_po_total:'Total PR/PO', kpi_po_received:'Sudah Diterima', kpi_po_ongoing:'Masih Berjalan',
@@ -983,7 +984,8 @@ const I18N = {
     kpi_parts_fast:'Fast Moving', kpi_parts_slow:'Slow Moving', kpi_parts_out:'Out of Stock',
     page_meters_title:'Meters', page_meters_subtitle_default:'Component running hours by area (weekly)',
     page_meters_subtitle_latest:(w)=>`Component running hours by area — latest reading: ${w}`,
-    meter_prev_week:'Last week',
+    meter_prev_week:'Last week', col_component:'Component', col_unit:'Unit',
+    meter_detail_week:'Week', meter_detail_value:'Value',
     page_po_title:'Purchase Orders',
     page_po_subtitle:'Parts & material procurement status — status is derived automatically from PR/PO/GR date columns',
     kpi_po_total:'Total PR/PO', kpi_po_received:'Received', kpi_po_ongoing:'In Progress',
@@ -1777,9 +1779,34 @@ function getFilteredMeterRows(){
   return rows;
 }
 
+/** Detail Running Hour dikustom (bukan pakai openDetailModal generik) supaya bisa
+ *  menampilkan tren mingguan sebagai grafik, dengan tabel angkanya di bawah grafik. */
 function openMeterDetail(row){
   const weekKeys = Object.keys(row).filter(k=>/^W\d+$/i.test(k)).sort((a,b)=>parseInt(a.slice(1))-parseInt(b.slice(1)));
-  openDetailModal(t('modal_detail_running_hour'), row, ['Area','Nama Mesin','Unit', ...weekKeys]);
+  const values = weekKeys.map(k=> Number(row[k])||0);
+  const unit = getField(row,'Unit');
+
+  $('#modalTitle').textContent = t('modal_detail_running_hour');
+  $('.modal-box', $('#modalBackdrop')).classList.add('modal-box--wide');
+  $('#modalBody').innerHTML = `
+    <div class="detail-row"><b>${t('form_area_label')}</b><span>${formatCell(getField(row,'Area'))}</span></div>
+    <div class="detail-row"><b>${t('col_component')}</b><span>${formatCell(getField(row,'Nama Mesin'))}</span></div>
+    <div class="detail-row"><b>${t('col_unit')}</b><span>${formatCell(unit)}</span></div>
+    <div class="chart-wrap sm" style="margin:18px 0 8px;"><canvas id="meterDetailChart"></canvas></div>
+    <div class="dt-scroll">
+      <table class="dt-table">
+        <thead><tr><th>${t('meter_detail_week')}</th><th>${t('meter_detail_value')}</th></tr></thead>
+        <tbody>${weekKeys.map((k,i)=>`<tr><td>${escapeHtml(k)}</td><td>${formatCell(values[i])}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>`;
+  $('#modalBackdrop').classList.add('show');
+
+  destroyChart('meterDetail');
+  STATE.charts.meterDetail = new Chart($('#meterDetailChart'), {
+    type:'line',
+    data:{ labels:weekKeys, datasets:[{ label:unit || t('meter_detail_value'), data:values, borderColor:CONFIG.CHART_COLORS[0], backgroundColor:'rgba(0,0,255,.1)', fill:true, tension:.3, pointRadius:3 }] },
+    options: baseChartOptions()
+  });
 }
 
 /** Render ulang isi grid kartu saja (dipanggil saat search/filter berubah), tanpa
@@ -1883,11 +1910,15 @@ function renderPoTable(){
  * 15. DETAIL MODAL
  * ---------------------------------------------------------------------- */
 function openDetailModal(title, row, fields){
+  $('.modal-box', $('#modalBackdrop')).classList.remove('modal-box--wide');
   $('#modalTitle').textContent = title;
   $('#modalBody').innerHTML = fields.map(f=>`<div class="detail-row"><b>${escapeHtml(f)}</b><span>${formatCell(getField(row,f))}</span></div>`).join('');
   $('#modalBackdrop').classList.add('show');
 }
-function closeDetailModal(){ $('#modalBackdrop').classList.remove('show'); }
+function closeDetailModal(){
+  $('#modalBackdrop').classList.remove('show');
+  destroyChart('meterDetail');
+}
 
 function openActivityModal(){
   populateMesinDropdown();
