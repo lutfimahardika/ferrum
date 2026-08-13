@@ -422,6 +422,15 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
 .detail-row:last-child{border-bottom:none;}
 .detail-row b{color:var(--text-muted);font-weight:600;flex-shrink:0;}
 .detail-row span{text-align:right;}
+.detail-table-wrap{max-height:230px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-sm);}
+table.detail-table{width:100%;border-collapse:collapse;}
+table.detail-table thead th{
+  position:sticky;top:0;background:var(--bg);text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.4px;
+  color:var(--text-muted);padding:9px 14px;border-bottom:1px solid var(--border);
+}
+table.detail-table tbody td{padding:8px 14px;font-size:12.5px;border-bottom:1px solid var(--border);}
+table.detail-table tbody tr:last-child td{border-bottom:none;}
+table.detail-table tbody tr:hover{background:var(--bg);}
 
 /* ---- Machine Meter cards ---- */
 .grid-meter{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
@@ -1792,9 +1801,9 @@ function openMeterDetail(row){
     <div class="detail-row"><b>${t('form_area_label')}</b><span>${formatCell(getField(row,'Area'))}</span></div>
     <div class="detail-row"><b>${t('col_component')}</b><span>${formatCell(getField(row,'Nama Mesin'))}</span></div>
     <div class="detail-row"><b>${t('col_unit')}</b><span>${formatCell(unit)}</span></div>
-    <div class="chart-wrap sm" style="margin:18px 0 8px;"><canvas id="meterDetailChart"></canvas></div>
-    <div class="dt-scroll">
-      <table class="dt-table">
+    <div class="chart-wrap" style="height:230px;margin:20px 0 10px;"><canvas id="meterDetailChart"></canvas></div>
+    <div class="detail-table-wrap">
+      <table class="detail-table">
         <thead><tr><th>${t('meter_detail_week')}</th><th>${t('meter_detail_value')}</th></tr></thead>
         <tbody>${weekKeys.map((k,i)=>`<tr><td>${escapeHtml(k)}</td><td>${formatCell(values[i])}</td></tr>`).join('')}</tbody>
       </table>
@@ -1802,10 +1811,37 @@ function openMeterDetail(row){
   $('#modalBackdrop').classList.add('show');
 
   destroyChart('meterDetail');
+  const ctx = $('#meterDetailChart').getContext('2d');
+  const gradient = ctx.createLinearGradient(0, 0, 0, 230);
+  gradient.addColorStop(0, 'rgba(0,0,255,.28)');
+  gradient.addColorStop(1, 'rgba(0,0,255,0)');
+  const cardColor = getComputedStyle(document.body).getPropertyValue('--card').trim();
+  const textColor = getComputedStyle(document.body).getPropertyValue('--text').trim();
+  const mutedColor = getComputedStyle(document.body).getPropertyValue('--text-muted').trim();
+  const borderColor = getComputedStyle(document.body).getPropertyValue('--border').trim();
+
+  const chartOptions = baseChartOptions({
+    plugins:{
+      legend:{ display:false },
+      tooltip:{
+        backgroundColor:cardColor, titleColor:textColor, bodyColor:mutedColor,
+        borderColor, borderWidth:1, padding:10, cornerRadius:8, displayColors:false,
+        callbacks:{ label:(ctx)=> `${ctx.formattedValue}${unit ? ' '+unit : ''}` }
+      }
+    }
+  });
+  chartOptions.scales.y.beginAtZero = false;
+  chartOptions.scales.y.grace = '12%';
+
   STATE.charts.meterDetail = new Chart($('#meterDetailChart'), {
     type:'line',
-    data:{ labels:weekKeys, datasets:[{ label:unit || t('meter_detail_value'), data:values, borderColor:CONFIG.CHART_COLORS[0], backgroundColor:'rgba(0,0,255,.1)', fill:true, tension:.3, pointRadius:3 }] },
-    options: baseChartOptions()
+    data:{ labels:weekKeys, datasets:[{
+      label:unit || t('meter_detail_value'), data:values,
+      borderColor:CONFIG.CHART_COLORS[0], backgroundColor:gradient, fill:true, tension:.4,
+      borderWidth:2.5, pointRadius:4, pointBackgroundColor:cardColor, pointBorderColor:CONFIG.CHART_COLORS[0],
+      pointBorderWidth:2, pointHoverRadius:6, pointHoverBackgroundColor:CONFIG.CHART_COLORS[0], pointHoverBorderColor:cardColor, pointHoverBorderWidth:2
+    }] },
+    options: chartOptions
   });
 }
 
