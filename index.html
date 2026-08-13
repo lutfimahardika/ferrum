@@ -625,7 +625,6 @@ table.dt-table tbody tr.dt-row-clickable:hover{background:var(--bg);}
           <div><h1 data-i18n="page_meters_title">Meters</h1><p id="meterSubtitle" data-i18n="page_meters_subtitle_default">Running hour komponen per area (mingguan)</p></div>
           <div class="page-head-actions"><button class="btn btn-primary btn-sm" id="btnRefreshMeter"><i class="fa-solid fa-rotate"></i> <span data-i18n="btn_refresh">Refresh</span></button></div>
         </div>
-        <div class="grid-kpi" id="meterKpiGrid" style="margin-bottom:18px;"></div>
         <div class="panel"><div id="tbl-meter"></div></div>
       </section>
 
@@ -885,8 +884,6 @@ const I18N = {
     kpi_parts_fast:'Fast Moving', kpi_parts_slow:'Slow Moving', kpi_parts_out:'Stok Habis',
     page_meters_title:'Meters', page_meters_subtitle_default:'Running hour komponen per area (mingguan)',
     page_meters_subtitle_latest:(w)=>`Running hour komponen per area — pembacaan terakhir: ${w}`,
-    kpi_meters_total_component:'Total Komponen', kpi_meters_total_area:'Total Area',
-    kpi_meters_up:'Naik Minggu Ini', kpi_meters_down:'Turun', kpi_meters_flat:'Stagnan',
     page_po_title:'Purchase Orders',
     page_po_subtitle:'Status pengadaan sparepart & material — status ditentukan otomatis dari kolom tanggal PR/PO/GR',
     kpi_po_total:'Total PR/PO', kpi_po_received:'Sudah Diterima', kpi_po_ongoing:'Masih Berjalan',
@@ -962,8 +959,6 @@ const I18N = {
     kpi_parts_fast:'Fast Moving', kpi_parts_slow:'Slow Moving', kpi_parts_out:'Out of Stock',
     page_meters_title:'Meters', page_meters_subtitle_default:'Component running hours by area (weekly)',
     page_meters_subtitle_latest:(w)=>`Component running hours by area — latest reading: ${w}`,
-    kpi_meters_total_component:'Total Components', kpi_meters_total_area:'Total Areas',
-    kpi_meters_up:'Up This Week', kpi_meters_down:'Down', kpi_meters_flat:'Flat',
     page_po_title:'Purchase Orders',
     page_po_subtitle:'Parts & material procurement status — status is derived automatically from PR/PO/GR date columns',
     kpi_po_total:'Total PR/PO', kpi_po_received:'Received', kpi_po_ongoing:'In Progress',
@@ -1738,28 +1733,15 @@ function renderSparepartTable(){
 // Sheet "Running Hour" tidak punya Target PM, jadi progress-bar-ke-PM tidak bisa dihitung.
 // Halaman ini menampilkan pembacaan mingguan terakhir per komponen (kolom W27, W28, ...,
 // dideteksi otomatis oleh loadMeter()) beserta perubahannya dari minggu sebelumnya.
-function renderMeterKpi(){
+function updateMeterSubtitle(){
   const rows = STATE.data.meter;
-  const grid = $('#meterKpiGrid');
-  const areaCount = new Set(rows.map(r=>getField(r,'Area')).filter(Boolean)).size;
-  const naik = rows.filter(r=>r._delta>0).length;
-  const turun = rows.filter(r=>r._delta<0).length;
-  const stagnan = rows.filter(r=>r._delta===0).length;
-  const cards = [
-    { label:t('kpi_meters_total_component'), value:rows.length, icon:'fa-gauge', cls:'bg-primary' },
-    { label:t('kpi_meters_total_area'), value:areaCount, icon:'fa-diagram-project', cls:'bg-secondary' },
-    { label:t('kpi_meters_up'), value:naik, icon:'fa-arrow-trend-up', cls:'bg-success' },
-    { label:t('kpi_meters_down'), value:turun, icon:'fa-arrow-trend-down', cls:'bg-danger' },
-    { label:t('kpi_meters_flat'), value:stagnan, icon:'fa-minus', cls:'bg-warning' }
-  ];
-  grid.innerHTML = cards.map(c=>`<div class="kpi-card"><div class="kpi-top"><div class="kpi-icon ${c.cls}"><i class="fa-solid ${c.icon}"></i></div></div><div class="kpi-value">${c.value}</div><div class="kpi-label">${c.label}</div></div>`).join('');
   if(rows.length && rows[0]._latestWeek){
     $('#meterSubtitle').textContent = t('page_meters_subtitle_latest', rows[0]._latestWeek);
   }
 }
 
 function renderMeterPage(){
-  renderMeterKpi();
+  updateMeterSubtitle();
   if(STATE.tables.meter){ STATE.tables.meter.refresh(); return; }
   const latestLabel = STATE.data.meter[0]?._latestWeek || 'Terakhir';
   const prevLabel = STATE.data.meter[0]?._prevWeek || 'Sebelumnya';
