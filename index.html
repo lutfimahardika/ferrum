@@ -284,9 +284,22 @@ a{color:inherit;}
 .page{display:none;}
 .page.active{display:block;animation:fadeUp .35s ease both;}
 .page-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
+.page-head>div:first-child{min-width:0;flex:1 1 200px;}
 .page-head h1{font-size:21px;}
 .page-head p{font-family:var(--font-display);font-style:italic;font-weight:300;font-size:12.5px;color:var(--text-muted);margin-top:2px;}
-.page-head-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.page-head-actions{display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;}
+@media(max-width:640px){
+  .page-head h1,.page-head p{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+}
+@media(max-width:480px){
+  /* Ruang terlalu sempit untuk judul + tombol berlabel teks dalam satu baris —
+     judul tidak lagi ikut tumbuh mengisi sisa ruang (flex-grow:0) dan dibatasi
+     max-width dengan margin aman, tombol jadi ikon saja supaya keduanya tetap
+     satu baris tanpa terpotong pas di batas (subpixel rounding). */
+  .page-head>div:first-child{flex:0 1 auto;max-width:calc(100% - 100px);}
+  .page-head-actions .btn span{display:none;}
+  .page-head-actions .btn{padding:10px 12px;}
+}
 
 /* ---- Buttons ---- */
 .btn{
@@ -606,7 +619,7 @@ table.detail-table tbody tr:hover{background:var(--bg);}
       <!-- ============================= OVERVIEW ============================= -->
       <section class="page active" id="page-overview">
         <div class="page-head">
-          <div><h1 data-i18n="page_overview_title">Overview Dashboard</h1><p data-i18n="page_overview_subtitle">Ringkasan downtime &amp; performa mesin — auto-refresh setiap 60 detik</p></div>
+          <div><h1 data-i18n="page_overview_title">Overview Dashboard</h1><p data-i18n="page_overview_subtitle">Ringkasan downtime &amp; performa mesin</p></div>
           <div class="page-head-actions">
             <button class="btn btn-outline btn-sm" id="btnExportOverview"><i class="fa-solid fa-file-csv"></i> <span data-i18n="btn_export_csv">Export CSV</span></button>
             <button class="btn btn-primary btn-sm" id="btnRefreshOverview"><i class="fa-solid fa-rotate"></i> <span data-i18n="btn_refresh">Refresh</span></button>
@@ -646,7 +659,7 @@ table.detail-table tbody tr:hover{background:var(--bg);}
       <!-- ============================= SPAREPART ============================= -->
       <section class="page" id="page-sparepart">
         <div class="page-head">
-          <div><h1 data-i18n="page_parts_title">Parts &amp; Inventory</h1><p data-i18n="page_parts_subtitle">Monitoring stok sparepart maintenance</p></div>
+          <div><h1 data-i18n="page_parts_title">Parts &amp; Inventory</h1><p data-i18n="page_parts_subtitle">Monitoring stok sparepart</p></div>
           <div class="page-head-actions"><button class="btn btn-primary btn-sm" id="btnRefreshSparepart"><i class="fa-solid fa-rotate"></i> <span data-i18n="btn_refresh">Refresh</span></button></div>
         </div>
         <div class="grid-kpi" id="spKpiGrid" style="margin-bottom:18px;"></div>
@@ -656,7 +669,7 @@ table.detail-table tbody tr:hover{background:var(--bg);}
       <!-- ============================= METER ============================= -->
       <section class="page" id="page-meter">
         <div class="page-head">
-          <div><h1 data-i18n="page_meters_title">Meters</h1><p id="meterSubtitle" data-i18n="page_meters_subtitle_default">Running hour komponen per area (mingguan)</p></div>
+          <div><h1 data-i18n="page_meters_title">Meters</h1><p id="meterSubtitle" data-i18n="page_meters_subtitle_default">Running hour per area</p></div>
           <div class="page-head-actions"><button class="btn btn-primary btn-sm" id="btnRefreshMeter"><i class="fa-solid fa-rotate"></i> <span data-i18n="btn_refresh">Refresh</span></button></div>
         </div>
         <div class="dt-toolbar">
@@ -670,7 +683,7 @@ table.detail-table tbody tr:hover{background:var(--bg);}
       <!-- ============================= PURCHASE ORDER ============================= -->
       <section class="page" id="page-po">
         <div class="page-head">
-          <div><h1 data-i18n="page_po_title">Purchase Orders</h1><p data-i18n="page_po_subtitle">Status pengadaan sparepart &amp; material — status ditentukan otomatis dari kolom tanggal PR/PO/GR</p></div>
+          <div><h1 data-i18n="page_po_title">Purchase Orders</h1><p data-i18n="page_po_subtitle">Status pengadaan sparepart</p></div>
           <div class="page-head-actions"><button class="btn btn-primary btn-sm" id="btnRefreshPO"><i class="fa-solid fa-rotate"></i> <span data-i18n="btn_refresh">Refresh</span></button></div>
         </div>
         <div class="grid-kpi" id="poKpiGrid" style="margin-bottom:18px;"></div>
@@ -886,7 +899,7 @@ const I18N = {
     btn_export_csv:'Export CSV', btn_refresh:'Refresh', btn_add_activity:'Tambahkan Aktivitas',
     btn_cancel:'Batal', btn_save:'Simpan', btn_save_loading:'Mengirim…', btn_export:'Export',
     page_overview_title:'Overview Dashboard',
-    page_overview_subtitle:'Ringkasan downtime & performa mesin — auto-refresh setiap 60 detik',
+    page_overview_subtitle:'Ringkasan downtime & performa mesin',
     chart_mesin_title:'Downtime per Mesin', chart_mesin_sub:'Total menit',
     chart_area_title:'Downtime per Kategori', chart_area_sub:'Total menit',
     chart_harian_title:'Downtime per Hari', chart_harian_sub:'14 hari terakhir',
@@ -918,15 +931,15 @@ const I18N = {
     form_issue_label:'Issue', form_issue_placeholder:'Deskripsikan issue',
     form_action_label:'Action', form_action_placeholder:'Tindakan yang dilakukan',
     form_remark_label:'Remark', form_remark_placeholder:'Catatan tambahan',
-    page_parts_title:'Parts & Inventory', page_parts_subtitle:'Monitoring stok sparepart maintenance',
+    page_parts_title:'Parts & Inventory', page_parts_subtitle:'Monitoring stok sparepart',
     kpi_parts_total:'Total Item', kpi_parts_total_value:'Total Nilai Inventory',
     kpi_parts_fast:'Fast Moving', kpi_parts_slow:'Slow Moving', kpi_parts_out:'Stok Habis',
-    page_meters_title:'Meters', page_meters_subtitle_default:'Running hour komponen per area (mingguan)',
-    page_meters_subtitle_latest:(w)=>`Running hour komponen per area — pembacaan terakhir: ${w}`,
+    page_meters_title:'Meters', page_meters_subtitle_default:'Running hour per area',
+    page_meters_subtitle_latest:(w)=>`Pembacaan terakhir: ${w}`,
     meter_prev_week:'Minggu lalu',
     meter_detail_week:'Minggu', meter_detail_value:'Nilai',
     page_po_title:'Purchase Orders',
-    page_po_subtitle:'Status pengadaan sparepart & material — status ditentukan otomatis dari kolom tanggal PR/PO/GR',
+    page_po_subtitle:'Status pengadaan sparepart',
     kpi_po_total:'Total PR/PO', kpi_po_received:'Sudah Diterima', kpi_po_ongoing:'Masih Berjalan',
     kpi_po_avg_leadtime:'Rata-rata Lead Time', kpi_po_leadtime_unit:'hari', kpi_po_total_value:'Total Nilai',
     dt_search_placeholder:'Cari...', dt_export:'Export',
@@ -963,7 +976,7 @@ const I18N = {
     btn_export_csv:'Export CSV', btn_refresh:'Refresh', btn_add_activity:'Add Activity',
     btn_cancel:'Cancel', btn_save:'Save', btn_save_loading:'Sending…', btn_export:'Export',
     page_overview_title:'Overview Dashboard',
-    page_overview_subtitle:'Downtime & machine performance summary — auto-refreshes every 60 seconds',
+    page_overview_subtitle:'Downtime & machine performance summary',
     chart_mesin_title:'Downtime by Machine', chart_mesin_sub:'Total minutes',
     chart_area_title:'Downtime by Category', chart_area_sub:'Total minutes',
     chart_harian_title:'Downtime by Day', chart_harian_sub:'Last 14 days',
@@ -995,15 +1008,15 @@ const I18N = {
     form_issue_label:'Issue', form_issue_placeholder:'Describe the issue',
     form_action_label:'Action', form_action_placeholder:'Action taken',
     form_remark_label:'Remark', form_remark_placeholder:'Additional notes',
-    page_parts_title:'Parts & Inventory', page_parts_subtitle:'Maintenance parts stock monitoring',
+    page_parts_title:'Parts & Inventory', page_parts_subtitle:'Parts stock monitoring',
     kpi_parts_total:'Total Items', kpi_parts_total_value:'Total Inventory Value',
     kpi_parts_fast:'Fast Moving', kpi_parts_slow:'Slow Moving', kpi_parts_out:'Out of Stock',
-    page_meters_title:'Meters', page_meters_subtitle_default:'Component running hours by area (weekly)',
-    page_meters_subtitle_latest:(w)=>`Component running hours by area — latest reading: ${w}`,
+    page_meters_title:'Meters', page_meters_subtitle_default:'Running hours by area',
+    page_meters_subtitle_latest:(w)=>`Latest reading: ${w}`,
     meter_prev_week:'Last week',
     meter_detail_week:'Week', meter_detail_value:'Value',
     page_po_title:'Purchase Orders',
-    page_po_subtitle:'Parts & material procurement status — status is derived automatically from PR/PO/GR date columns',
+    page_po_subtitle:'Parts procurement status',
     kpi_po_total:'Total PR/PO', kpi_po_received:'Received', kpi_po_ongoing:'In Progress',
     kpi_po_avg_leadtime:'Average Lead Time', kpi_po_leadtime_unit:'days', kpi_po_total_value:'Total Value',
     dt_search_placeholder:'Search...', dt_export:'Export',
